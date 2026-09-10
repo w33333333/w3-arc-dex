@@ -273,6 +273,7 @@ async function activate(p, label, request = true) {
     p.on?.("chainChanged", () => location.reload());
     await refresh();
     await refreshRewards();
+    if ($("liqManage")?.classList.contains("active")) await loadPositions();
     toast(`${label} 连接成功`);
   } catch (e) {
     toast(
@@ -907,6 +908,19 @@ async function txButton(b, work) {
     b.textContent = old;
   }
 }
+const ACTIVE_PAGE_KEY = "w3-active-page";
+function saveActivePage(page) {
+  try {
+    sessionStorage.setItem(ACTIVE_PAGE_KEY, page);
+  } catch {}
+}
+function readActivePage() {
+  try {
+    return sessionStorage.getItem(ACTIVE_PAGE_KEY) || "";
+  } catch {
+    return "";
+  }
+}
 document.querySelectorAll(".nav").forEach(
   (n) =>
     (n.onclick = () => {
@@ -926,8 +940,11 @@ document.querySelectorAll(".nav").forEach(
           .querySelector('[data-liq-page="' + page + '"]')
           ?.classList.add("active");
         $(page === "add" ? "liqAdd" : "liqManage").classList.add("active");
+        saveActivePage(`liquidity:${page}`);
         if (page === "manage") loadPositions();
         else loadPool();
+      } else {
+        saveActivePage(n.dataset.panel);
       }
     }),
 );
@@ -941,6 +958,7 @@ document.querySelectorAll("[data-liq-page]").forEach(
       $(b.dataset.liqPage === "add" ? "liqAdd" : "liqManage").classList.add(
         "active",
       );
+      saveActivePage(`liquidity:${b.dataset.liqPage}`);
       if (b.dataset.liqPage === "manage") loadPositions();
     }),
 );
@@ -2497,3 +2515,19 @@ maxPriceSlider.onchange = updateRangeVisual;
   input.addEventListener("input", () => setTimeout(updateRangeVisual, 0)),
 );
 syncPriceSlidersFromNumbers();
+
+function restoreActivePage() {
+  const saved = readActivePage();
+  if (!saved) return;
+  let target;
+  if (saved.startsWith("liquidity:")) {
+    const page = saved.slice("liquidity:".length);
+    target = document.querySelector(
+      `.topbar .nav[data-panel="liquidity"][data-liq-nav="${page}"]`,
+    );
+  } else {
+    target = document.querySelector(`.topbar .nav[data-panel="${saved}"]`);
+  }
+  target?.click();
+}
+requestAnimationFrame(restoreActivePage);
