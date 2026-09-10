@@ -13,6 +13,27 @@ let provider = new ethers.JsonRpcProvider(C.rpcUrl),
   marketPoints = [];
 const announced = [],
   poolState = {};
+const chainReadProviders = [
+  C.rpcUrl,
+  "https://rpc.drpc.testnet.arc.network",
+  "https://rpc.quicknode.testnet.arc.network",
+].map((url) => new ethers.JsonRpcProvider(url));
+async function reliableRead(call, timeoutMs = 6500) {
+  let lastError;
+  for (const readProvider of chainReadProviders) {
+    try {
+      return await Promise.race([
+        call(readProvider),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(Error("RPC timeout")), timeoutMs),
+        ),
+      ]);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError || Error("RPC unavailable");
+}
 const tokenBase = {
   USDC: { symbol: "USDC", address: C.usdc, decimals: 6 },
   W3: { symbol: "W3", address: C.w3, decimals: 18 },
@@ -1596,7 +1617,6 @@ $("positionsList").after(removedSection);
 loadPositions = async function () {
   const list = $("positionsList"),
     removedList = $("removedPositionsList");
-  positionCache.clear();
   if (!account) {
     list.innerHTML =
       '<div class="empty-position"><b>连接钱包后查看</b><span>这里会显示当前有流动性的 V3 LP 仓位。</span></div>';
@@ -1606,13 +1626,21 @@ loadPositions = async function () {
     return;
   }
   try {
-    const m = new ethers.Contract(C.positionManager, NFPM, provider),
-      count = Number(await m.balanceOf(account)),
+    const count = Number(
+        await reliableRead((readProvider) =>
+          new ethers.Contract(C.positionManager, NFPM, readProvider).balanceOf(account),
+        ),
+      ),
       activeRows = [],
-      removedRows = [];
+      removedRows = [],
+      nextPositionCache = new Map();
     for (let i = 0; i < count; i++) {
-      const id = await m.tokenOfOwnerByIndex(account, i),
-        p = await m.positions(id);
+      const id = await reliableRead((readProvider) =>
+          new ethers.Contract(C.positionManager, NFPM, readProvider).tokenOfOwnerByIndex(account, i),
+        ),
+        p = await reliableRead((readProvider) =>
+          new ethers.Contract(C.positionManager, NFPM, readProvider).positions(id),
+        );
       if (
         ![p[2].toLowerCase(), p[3].toLowerCase()].includes(
           C.usdc.toLowerCase(),
@@ -1653,7 +1681,7 @@ loadPositions = async function () {
         );
         continue;
       }
-      positionCache.set(id.toString(), {
+      nextPositionCache.set(id.toString(), {
         id: id.toString(),
         f,
         lower,
@@ -1691,6 +1719,8 @@ loadPositions = async function () {
           '">移除</button></div></article>',
       );
     }
+    positionCache.clear();
+    nextPositionCache.forEach((value, key) => positionCache.set(key, value));
     list.innerHTML =
       activeRows.join("") ||
       '<div class="empty-position"><b>暂无有效 V3 仓位</b><span>已全部移除的仓位会显示在下方。</span></div>';
@@ -1704,11 +1734,11 @@ loadPositions = async function () {
       .querySelectorAll("[data-remove]")
       .forEach((b) => (b.onclick = () => openRemovePosition(b.dataset.remove)));
   } catch {
-    list.innerHTML =
-      '<div class="empty-position"><b>仓位读取失败</b><span>请确认钱包网络为 ARC Testnet 后重试。</span></div>';
-    removedList.innerHTML =
-      '<div class="removed-empty">已移除仓位读取失败</div>';
-    $("removedCount").textContent = "—";
+    if (!list.querySelector(".position-item") && !list.querySelector(".empty-position[data-loaded]"))
+      list.innerHTML =
+        '<div class="empty-position"><b>链上数据暂时不可用</b><span>正在自动切换节点重试，已有仓位不会被清除。</span></div>';
+    clearTimeout(loadPositions.retryTimer);
+    loadPositions.retryTimer = setTimeout(() => loadPositions(), 1800);
   }
 };
 
@@ -1771,25 +1801,39 @@ async function loadStakedPositions() {
     return;
   }
   try {
-    const m = new ethers.Contract(C.positionManager, NFPM, provider),
-      s = new ethers.Contract(C.staker, STAKER, provider),
-      feeRewards = new ethers.Contract(C.feeRewards, FEE_REWARDS, provider),
-      total = Number(await m.totalSupply()),
+    const m = new ethers.Contract(C.positionManager, NFPM, chainReadProviders[0]),
+      s = new ethers.Contract(C.staker, STAKER, chainReadProviders[0]),
+      feeRewards = new ethers.Contract(C.feeRewards, FEE_REWARDS, chainReadProviders[0]),
+      total = Number(
+        await reliableRead((readProvider) =>
+          new ethers.Contract(C.positionManager, NFPM, readProvider).totalSupply(),
+        ),
+      ),
       rows = [],
       max = (1n << 128n) - 1n;
     for (let i = 0; i < total; i++) {
-      const id = await m.tokenByIndex(i);
+      const id = await reliableRead((readProvider) =>
+        new ethers.Contract(C.positionManager, NFPM, readProvider).tokenByIndex(i),
+      );
       let owner;
       try {
-        owner = await m.ownerOf(id);
+        owner = await reliableRead((readProvider) =>
+          new ethers.Contract(C.positionManager, NFPM, readProvider).ownerOf(id),
+        );
       } catch {
         continue;
       }
       const isFeeRewards = owner.toLowerCase() === C.feeRewards.toLowerCase();
       if (!isFeeRewards && owner.toLowerCase() !== C.staker.toLowerCase()) continue;
-      const d = isFeeRewards ? await feeRewards.deposits(id) : await s.deposits(id);
+      const d = await reliableRead((readProvider) =>
+        isFeeRewards
+          ? new ethers.Contract(C.feeRewards, FEE_REWARDS, readProvider).deposits(id)
+          : new ethers.Contract(C.staker, STAKER, readProvider).deposits(id),
+      );
       if (d.owner.toLowerCase() !== account.toLowerCase()) continue;
-      const p = await m.positions(id);
+      const p = await reliableRead((readProvider) =>
+        new ethers.Contract(C.positionManager, NFPM, readProvider).positions(id),
+      );
       if (
         ![p[2].toLowerCase(), p[3].toLowerCase()].includes(
           C.usdc.toLowerCase(),
@@ -1887,9 +1931,8 @@ async function loadStakedPositions() {
             activateDepositedPosition(b, b.dataset.startIncentive)),
       );
   } catch {
-    list.innerHTML =
-      '<div class="staked-empty">已质押流动性读取失败，请稍后重试</div>';
-    $("stakedCount").textContent = "—";
+    if (!list.querySelector(".staked-item"))
+      list.innerHTML = '<div class="staked-empty">链上数据同步中，将自动重试</div>';
   }
 }
 async function redeemStakedPosition(button, id) {
