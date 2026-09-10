@@ -2295,7 +2295,9 @@ setTokenFieldVisibility("Out");
 document
   .querySelector('[data-panel="swap"]')
   .addEventListener("click", () => loadMarketHistory());
-loadMarketHistory();
+// Let the visible shell and core pool snapshot finish first. Full historical
+// Swap indexing is useful but must never compete with first-page rendering.
+setTimeout(() => loadMarketHistory(), 1800);
 $('stakeTokenId').addEventListener("input", refreshRewards);
 setInterval(() => {
   if (document.visibilityState === "visible") loadMarketHistory(true);
