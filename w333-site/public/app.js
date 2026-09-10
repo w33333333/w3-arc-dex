@@ -2402,11 +2402,8 @@ function renderSliderOverlay(left, right) {
     maxLabel = $("maxPriceDistance"),
     minPrice = Number($("minPrice").value),
     maxPrice = Number($("maxPrice").value);
-  minLabel.style.left = left + "%";
-  maxLabel.style.left = right + "%";
-  minLabel.textContent = fullRange ? "最低 −∞" : `最低 ${distanceFromCurrent(minPrice)}`;
-  maxLabel.textContent = fullRange ? "最高 +∞" : `最高 ${distanceFromCurrent(maxPrice)}`;
-  minLabel.classList.toggle("is-stacked", right - left < 18);
+  minLabel.textContent = fullRange ? "—" : distanceFromCurrent(minPrice);
+  maxLabel.textContent = fullRange ? "—" : distanceFromCurrent(maxPrice);
 }
 function syncPriceSlidersFromNumbers({ fit = true } = {}) {
   if (fullRange) {

@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="./detail.css" />
     <link rel="stylesheet" href="./holders.css" />
     <link rel="stylesheet" href="./feature-v21.css" />
-    <link rel="stylesheet" href="./w333-theme.css?v=35" />
+    <link rel="stylesheet" href="./w333-theme.css?v=36" />
   </head>
   <body>
     <header class="topbar">
@@ -195,12 +195,12 @@
               </div>
               <div class="depth-chart" id="depthChart" aria-label="V3 价格区间">
                 <div class="axis">
-                  <span>最低价</span><span>当前价</span><span>最高价</span>
+                  <span>最低价</span><span id="minPriceDistance" class="range-distance">—</span
+                  ><span>当前价</span><span id="maxPriceDistance" class="range-distance">—</span
+                  ><span>最高价</span>
                 </div>
                 <div class="range-track">
-                  <span id="minPriceDistance" class="range-distance">—</span
-                  ><span id="maxPriceDistance" class="range-distance">—</span
-                  ><i id="rangeFill"></i><b id="priceMarker"></b
+                  <i id="rangeFill"></i><b id="priceMarker"></b
                   ><input id="minPriceSlider" class="price-range-slider" type="range" min="0" max="1000" step="1" aria-label="拖动选择最低价格"
                   ><input id="maxPriceSlider" class="price-range-slider" type="range" min="0" max="1000" step="1" aria-label="拖动选择最高价格">
                 </div>
@@ -499,12 +499,12 @@
     </dialog>
     <div id="toast" role="status" aria-live="polite"></div>
     <script src="./ethers-6.13.4.min.js" defer></script>
-    <script src="./config.js?v=35" defer></script>
-    <script src="./app.js?v=35" defer></script>
+    <script src="./config.js?v=36" defer></script>
+    <script src="./app.js?v=36" defer></script>
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
-          setTimeout(() => navigator.serviceWorker.register("./sw.js?v=35"), 2500);
+          setTimeout(() => navigator.serviceWorker.register("./sw.js?v=36"), 2500);
         });
       }
     </script>
