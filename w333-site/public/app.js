@@ -2303,37 +2303,44 @@ setInterval(() => {
   if (document.visibilityState === "visible") loadMarketHistory(true);
 }, 30000);
 
-// Draggable V3 price-range handles. The scale is logarithmic around the
-// current pool price so both tight and wide ranges remain easy to select.
+// Draggable V3 price-range handles. Fit the visible scale to the selected
+// interval so narrow presets still leave a generous, touch-friendly gap.
 const minPriceSlider = $("minPriceSlider"),
-  maxPriceSlider = $("maxPriceSlider"),
-  sliderFloorRatio = 0.1,
-  sliderCeilRatio = 10;
+  maxPriceSlider = $("maxPriceSlider");
+let sliderViewMin = Math.max(Number.EPSILON, currentPrice * 0.7),
+  sliderViewMax = currentPrice * 1.3;
+function fitSliderViewport(min, max) {
+  if (!(min > 0 && max > min)) {
+    sliderViewMin = Math.max(Number.EPSILON, currentPrice * 0.5);
+    sliderViewMax = currentPrice * 1.5;
+    return;
+  }
+  const span = max - min;
+  const padding = Math.max(span * 0.35, currentPrice * 0.015);
+  sliderViewMin = Math.max(Number.EPSILON, min - padding);
+  sliderViewMax = max + padding;
+}
 function priceFromSlider(value) {
   const progress = Number(value) / 1000;
-  return (
-    currentPrice *
-    Math.exp(
-      Math.log(sliderFloorRatio) +
-        progress * Math.log(sliderCeilRatio / sliderFloorRatio),
-    )
-  );
+  return sliderViewMin + progress * (sliderViewMax - sliderViewMin);
 }
 function sliderFromPrice(price) {
-  if (!(price > 0 && currentPrice > 0)) return 0;
+  const span = sliderViewMax - sliderViewMin;
+  if (!(price > 0 && span > 0)) return 0;
   return Math.max(
     0,
     Math.min(
       1000,
-      Math.round(
-        (Math.log(price / currentPrice / sliderFloorRatio) /
-          Math.log(sliderCeilRatio / sliderFloorRatio)) *
-          1000,
-      ),
+      Math.round(((price - sliderViewMin) / span) * 1000),
     ),
   );
 }
-function syncPriceSlidersFromNumbers() {
+function currentMarkerPercent() {
+  const span = sliderViewMax - sliderViewMin;
+  if (!(span > 0)) return 50;
+  return Math.max(0, Math.min(100, ((currentPrice - sliderViewMin) / span) * 100));
+}
+function syncPriceSlidersFromNumbers({ fit = true } = {}) {
   if (fullRange) {
     minPriceSlider.value = 0;
     maxPriceSlider.value = 1000;
@@ -2341,6 +2348,7 @@ function syncPriceSlidersFromNumbers() {
   }
   const min = Number($("minPrice").value),
     max = Number($("maxPrice").value);
+  if (fit && min > 0 && max > min) fitSliderViewport(min, max);
   if (min > 0) minPriceSlider.value = sliderFromPrice(min);
   if (max > min) maxPriceSlider.value = sliderFromPrice(max);
 }
@@ -2352,7 +2360,7 @@ updateRangeVisual = function () {
     right = fullRange ? 100 : Number(maxPriceSlider.value) / 10;
   $("rangeFill").style.left = left + "%";
   $("rangeFill").style.width = Math.max(0, right - left) + "%";
-  $("priceMarker").style.left = "50%";
+  $("priceMarker").style.left = currentMarkerPercent() + "%";
 };
 function updatePricesFromSlider(changed) {
   let low = Number(minPriceSlider.value),
@@ -2374,12 +2382,12 @@ function updatePricesFromSlider(changed) {
   baseUpdateRangeVisual();
   $("rangeFill").style.left = low / 10 + "%";
   $("rangeFill").style.width = (high - low) / 10 + "%";
-  $("priceMarker").style.left = "50%";
+  $("priceMarker").style.left = currentMarkerPercent() + "%";
   updateMatchedLiquidityAmounts();
 }
 minPriceSlider.oninput = () => updatePricesFromSlider("min");
 maxPriceSlider.oninput = () => updatePricesFromSlider("max");
 [$("minPrice"), $("maxPrice")].forEach((input) =>
-  input.addEventListener("input", () => setTimeout(syncPriceSlidersFromNumbers, 0)),
+  input.addEventListener("input", () => setTimeout(updateRangeVisual, 0)),
 );
 syncPriceSlidersFromNumbers();
