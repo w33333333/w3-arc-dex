@@ -2364,9 +2364,10 @@ function fitSliderViewport(min, max) {
     return;
   }
   const span = max - min;
-  const padding = Math.max(span * 0.35, currentPrice * 0.015);
-  sliderViewMin = Math.max(Number.EPSILON, min - padding);
-  sliderViewMax = max + padding;
+  const viewSpan = Math.max(currentPrice * 1.2, span * 1.25),
+    center = (min + max) / 2;
+  sliderViewMin = Math.max(Number.EPSILON, center - viewSpan / 2);
+  sliderViewMax = sliderViewMin + viewSpan;
 }
 function priceFromSlider(value) {
   const progress = Number(value) / 1000;
@@ -2388,6 +2389,25 @@ function currentMarkerPercent() {
   if (!(span > 0)) return 50;
   return Math.max(0, Math.min(100, ((currentPrice - sliderViewMin) / span) * 100));
 }
+function distanceFromCurrent(price) {
+  if (!(price > 0 && currentPrice > 0)) return "—";
+  const percent = (price / currentPrice - 1) * 100;
+  return `${percent >= 0 ? "+" : ""}${percent.toFixed(2)}%`;
+}
+function renderSliderOverlay(left, right) {
+  $("rangeFill").style.left = left + "%";
+  $("rangeFill").style.width = Math.max(0, right - left) + "%";
+  $("priceMarker").style.left = currentMarkerPercent() + "%";
+  const minLabel = $("minPriceDistance"),
+    maxLabel = $("maxPriceDistance"),
+    minPrice = Number($("minPrice").value),
+    maxPrice = Number($("maxPrice").value);
+  minLabel.style.left = left + "%";
+  maxLabel.style.left = right + "%";
+  minLabel.textContent = fullRange ? "最低 −∞" : `最低 ${distanceFromCurrent(minPrice)}`;
+  maxLabel.textContent = fullRange ? "最高 +∞" : `最高 ${distanceFromCurrent(maxPrice)}`;
+  minLabel.classList.toggle("is-stacked", right - left < 18);
+}
 function syncPriceSlidersFromNumbers({ fit = true } = {}) {
   if (fullRange) {
     minPriceSlider.value = 0;
@@ -2406,9 +2426,7 @@ updateRangeVisual = function () {
   syncPriceSlidersFromNumbers();
   const left = fullRange ? 0 : Number(minPriceSlider.value) / 10,
     right = fullRange ? 100 : Number(maxPriceSlider.value) / 10;
-  $("rangeFill").style.left = left + "%";
-  $("rangeFill").style.width = Math.max(0, right - left) + "%";
-  $("priceMarker").style.left = currentMarkerPercent() + "%";
+  renderSliderOverlay(left, right);
 };
 function updatePricesFromSlider(changed) {
   let low = Number(minPriceSlider.value),
@@ -2428,13 +2446,13 @@ function updatePricesFromSlider(changed) {
   $("minPrice").value = fmtPrice(priceFromSlider(low));
   $("maxPrice").value = fmtPrice(priceFromSlider(high));
   baseUpdateRangeVisual();
-  $("rangeFill").style.left = low / 10 + "%";
-  $("rangeFill").style.width = (high - low) / 10 + "%";
-  $("priceMarker").style.left = currentMarkerPercent() + "%";
+  renderSliderOverlay(low / 10, high / 10);
   updateMatchedLiquidityAmounts();
 }
 minPriceSlider.oninput = () => updatePricesFromSlider("min");
 maxPriceSlider.oninput = () => updatePricesFromSlider("max");
+minPriceSlider.onchange = updateRangeVisual;
+maxPriceSlider.onchange = updateRangeVisual;
 [$("minPrice"), $("maxPrice")].forEach((input) =>
   input.addEventListener("input", () => setTimeout(updateRangeVisual, 0)),
 );

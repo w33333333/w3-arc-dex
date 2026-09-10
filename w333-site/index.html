@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="./detail.css" />
     <link rel="stylesheet" href="./holders.css" />
     <link rel="stylesheet" href="./feature-v21.css" />
-    <link rel="stylesheet" href="./w333-theme.css?v=34" />
+    <link rel="stylesheet" href="./w333-theme.css?v=35" />
   </head>
   <body>
     <header class="topbar">
@@ -198,7 +198,9 @@
                   <span>最低价</span><span>当前价</span><span>最高价</span>
                 </div>
                 <div class="range-track">
-                  <i id="rangeFill"></i><b id="priceMarker"></b
+                  <span id="minPriceDistance" class="range-distance">—</span
+                  ><span id="maxPriceDistance" class="range-distance">—</span
+                  ><i id="rangeFill"></i><b id="priceMarker"></b
                   ><input id="minPriceSlider" class="price-range-slider" type="range" min="0" max="1000" step="1" aria-label="拖动选择最低价格"
                   ><input id="maxPriceSlider" class="price-range-slider" type="range" min="0" max="1000" step="1" aria-label="拖动选择最高价格">
                 </div>
@@ -247,7 +249,7 @@
                     /><b>USDC</b>
                   </div></label
                 ><label
-                  ><span class="deposit-label"><span>W3 · 按当前价格自动匹配</span><small id="liqBalanceW3">余额 —</small></span>
+                  ><span class="deposit-label"><span>W3</span><small id="liqBalanceW3">余额 —</small></span>
                   <div>
                     <input id="liqW3" inputmode="decimal" placeholder="0.0" /><b
                       >W3</b
@@ -497,12 +499,12 @@
     </dialog>
     <div id="toast" role="status" aria-live="polite"></div>
     <script src="./ethers-6.13.4.min.js" defer></script>
-    <script src="./config.js?v=34" defer></script>
-    <script src="./app.js?v=34" defer></script>
+    <script src="./config.js?v=35" defer></script>
+    <script src="./app.js?v=35" defer></script>
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
-          setTimeout(() => navigator.serviceWorker.register("./sw.js?v=34"), 2500);
+          setTimeout(() => navigator.serviceWorker.register("./sw.js?v=35"), 2500);
         });
       }
     </script>
