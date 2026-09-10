@@ -496,6 +496,7 @@ async function renderIncentives() {
       addIncentiveFee = Number(button.dataset.addIncentive);
       $("addIncentivePool").textContent = `USDC / W3 · ${feeLabel(addIncentiveFee)} 池`;
       $("addIncentiveAmount").value = "";
+      $("addIncentiveStatus").textContent = "";
       $("addIncentiveDialog").showModal();
     };
   });
@@ -1072,19 +1073,45 @@ $("confirmAddIncentive").onclick = async () => {
   if (!account) return toast("请先连接钱包");
   const amountText = $("addIncentiveAmount").value.trim();
   if (!amountText || Number(amountText) <= 0) return toast("请输入 W3 激励数量");
-  const amount = ethers.parseEther(amountText),
-    token = new ethers.Contract(C.w3, ERC20, signer),
-    rewards = new ethers.Contract(C.feeRewards, FEE_REWARDS, signer),
-    button = $("confirmAddIncentive");
-  $("addIncentiveDialog").close();
-  await txButton(button, async () => {
-    if ((await token.allowance(account, C.feeRewards)) < amount) {
-      const approval = await token.approve(C.feeRewards, ethers.MaxUint256);
+  const button = $("confirmAddIncentive"),
+    status = $("addIncentiveStatus"),
+    old = button.textContent;
+  button.disabled = true;
+  try {
+    const amount = ethers.parseEther(amountText),
+      readToken = new ethers.Contract(C.w3, ERC20, provider),
+      balance = await readToken.balanceOf(account);
+    if (balance < amount)
+      throw Error(`W3 余额不足，当前可用 ${Number(ethers.formatEther(balance)).toLocaleString(undefined, { maximumFractionDigits: 5 })} W3`);
+    const token = readToken.connect(signer),
+      rewards = new ethers.Contract(C.feeRewards, FEE_REWARDS, signer);
+    if ((await readToken.allowance(account, C.feeRewards)) < amount) {
+      button.textContent = "请在 OKX 钱包确认授权";
+      status.textContent = "第 1/2 步：授权本次 W3 数量。若未弹出，请打开 OKX 钱包查看待处理请求。";
+      const approval = await token.approve(C.feeRewards, amount);
+      status.textContent = "授权交易确认中…";
       await approval.wait();
     }
-    return rewards.addIncentive(C.pools[addIncentiveFee], amount);
-  });
-  await renderIncentives();
+    button.textContent = "请在 OKX 钱包确认添加";
+    status.textContent = "最后一步：确认把 W3 添加到该池的 7 天激励。";
+    const tx = await rewards.addIncentive(C.pools[addIncentiveFee], amount);
+    button.textContent = "链上确认中…";
+    status.textContent = "交易已提交，正在等待 ARC Testnet 确认。";
+    await tx.wait();
+    status.textContent = "添加成功。";
+    toast("W3 激励添加成功");
+    await renderIncentives();
+    setTimeout(() => $("addIncentiveDialog").close(), 700);
+  } catch (e) {
+    const message = e.shortMessage || e.reason || e.message || "添加激励失败";
+    status.textContent = message.includes("user rejected")
+      ? "已取消钱包请求，可重新点击提交。"
+      : message;
+    toast(status.textContent);
+  } finally {
+    button.disabled = false;
+    button.textContent = old;
+  }
 };
 $("watchW3").onclick = async () => {
   try {
