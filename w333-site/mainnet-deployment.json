@@ -1,0 +1,230 @@
+{
+  "owner": "0x2A319D550C64e54DB5337c9291706E89fB72f62F",
+  "startedAt": "2026-09-09T00:57:37.152Z",
+  "poolTarget": "0.09",
+  "walletTestReserve": "0.01",
+  "chains": {
+    "xlayer": {
+      "chainId": 196,
+      "transactions": [
+        {
+          "label": "deploy",
+          "hash": "0x7a0ceab40ae85b5031fbc820e4d995a057ea843dc48a6c0fd68c94e22ffc8da7",
+          "nonce": 0,
+          "status": "confirmed",
+          "estimatedMaxFee": "0.000078602019275084",
+          "block": 70146423,
+          "feeWei": "64958138706589"
+        },
+        {
+          "label": "pair",
+          "hash": "0xd350de3fb5796fe1a158536d19c4d0066d4fe82ee03ded818a14bf4df99b2d4a",
+          "nonce": 1,
+          "status": "confirmed",
+          "estimatedMaxFee": "0.000001390176057924",
+          "block": 70146439,
+          "feeWei": "1149216047884"
+        },
+        {
+          "label": "send-library",
+          "hash": "0x61d6e0805ea278855f7e20d6285be5dfb344e707ca9811743c49f0510ea78f76",
+          "nonce": 2,
+          "status": "confirmed",
+          "estimatedMaxFee": "0.00000168600007025",
+          "block": 70146444,
+          "feeWei": "1385520057730"
+        },
+        {
+          "label": "receive-library",
+          "hash": "0x2efed4ed49d4f14fe754c4626c40a20d936740b62fba09596767cab3fdc67ae9",
+          "nonce": 3,
+          "status": "confirmed",
+          "estimatedMaxFee": "0.000001879368078307",
+          "block": 70146450,
+          "feeWei": "1546008064417"
+        },
+        {
+          "label": "send-security",
+          "hash": "0x8e0d6f2c845af1b1065acde11b60a35f84f6b2f9243356450ba1fa60b227a8ec",
+          "nonce": 4,
+          "status": "confirmed",
+          "estimatedMaxFee": "0.00000487608020317",
+          "block": 70146455,
+          "feeWei": "4003632166818"
+        },
+        {
+          "label": "receive-security",
+          "hash": "0x3bd27c4b7bb006ae55b27bb87429e95ac41a9bfb42c09db64c33176114eb6fae",
+          "nonce": 5,
+          "status": "confirmed",
+          "estimatedMaxFee": "0.000004064832169368",
+          "block": 70146461,
+          "feeWei": "3332904138871"
+        },
+        {
+          "label": "approve-pool-0.09",
+          "hash": "0x67afb5500950cb895844adcff319fa730934085fe7adaca61da5770165380540",
+          "nonce": 6,
+          "status": "confirmed",
+          "estimatedMaxFee": "0.000001356264056511",
+          "block": 70146605,
+          "feeWei": "1121040046710"
+        },
+        {
+          "label": "fund-pool-0.09",
+          "hash": "0x6ecd6fb443ee300367e2eed21998206bdcd8d523854d91551b1efc0aed75c8c2",
+          "nonce": 7,
+          "status": "confirmed",
+          "estimatedMaxFee": "0.000002865792119408",
+          "block": 70146610,
+          "feeWei": "2147160089465"
+        },
+        {
+          "label": "enable",
+          "hash": "0x173a27baaa15b83277123c50ba3f35ea037ff812fb9877b5119ba18750b3448d",
+          "nonce": 8,
+          "status": "confirmed",
+          "estimatedMaxFee": "0.000000936576039024",
+          "block": 70146620,
+          "feeWei": "654360027265"
+        }
+      ],
+      "address": "0x2E6B9b1AD827e8C91E1B355173D76d5770Bf5735",
+      "send": {
+        "confirmations": "225000",
+        "requiredDVNs": [
+          "0x28af4dADbc5066e994986E8bb105240023dC44B6",
+          "0x9C061c9A4782294eeF65ef28Cb88233A987F4bdD"
+        ],
+        "optionalDVNs": []
+      },
+      "receive": {
+        "confirmations": "20",
+        "requiredDVNs": [
+          "0x28af4dADbc5066e994986E8bb105240023dC44B6",
+          "0x9C061c9A4782294eeF65ef28Cb88233A987F4bdD"
+        ],
+        "optionalDVNs": []
+      },
+      "resultFee": "0.002490396779429572",
+      "configured": true,
+      "walletW3": "0.01",
+      "freeLiquidity": "0.09",
+      "nativeBalance": "0.009920356380681516",
+      "paused": false,
+      "totalFees": "0.000076375419182309"
+    },
+    "bnb": {
+      "chainId": 56,
+      "transactions": [
+        {
+          "label": "deploy",
+          "hash": "0x6f19c0ffa3ed78f1510155f8ecb9a5e86889c4b56a1a7905472de4be29600180",
+          "nonce": 0,
+          "status": "confirmed",
+          "estimatedMaxFee": "0.00019650504",
+          "block": 120786190,
+          "feeWei": "162395340000000"
+        },
+        {
+          "label": "pair",
+          "hash": "0x7aac86a19b58824bd981abf96d0d18d9d063140a9bd67c917bff4ba690622888",
+          "nonce": 1,
+          "status": "confirmed",
+          "estimatedMaxFee": "0.00000347544",
+          "block": 120786277,
+          "feeWei": "2873040000000"
+        },
+        {
+          "label": "send-library",
+          "hash": "0xc1c96517e0c519dd3e08b271e76272148d82767cc960e6fd22006e4ef44156fc",
+          "nonce": 2,
+          "status": "confirmed",
+          "estimatedMaxFee": "0.00000421584",
+          "block": 120786289,
+          "feeWei": "3464520000000"
+        },
+        {
+          "label": "receive-library",
+          "hash": "0xc804b1411e5682d43cff419edf4ae3cf1e602b731ca634819122a10fe572b416",
+          "nonce": 3,
+          "status": "confirmed",
+          "estimatedMaxFee": "0.00000469842",
+          "block": 120786302,
+          "feeWei": "3865020000000"
+        },
+        {
+          "label": "send-security",
+          "hash": "0x852f40d60e3aba71f3bb92ebadce24556cab62c57070a74617b9ffb023f5c459",
+          "nonce": 4,
+          "status": "confirmed",
+          "estimatedMaxFee": "0.0000121902",
+          "block": 120786315,
+          "feeWei": "10009080000000"
+        },
+        {
+          "label": "receive-security",
+          "hash": "0x9ab9e995506fbc61fee9c69a77a9307f67bd391f69fe93f90b67f9c12b507002",
+          "nonce": 5,
+          "status": "confirmed",
+          "estimatedMaxFee": "0.00001016472",
+          "block": 120786338,
+          "feeWei": "8334420000000"
+        },
+        {
+          "label": "approve-pool-0.09",
+          "hash": "0x799c7ad9fdadb7b6f0a261e5b22cabfa0b6c556807368631b9b28f89f8127b85",
+          "nonce": 6,
+          "status": "confirmed",
+          "estimatedMaxFee": "0.00000339072",
+          "block": 120786362,
+          "feeWei": "2802660000000"
+        },
+        {
+          "label": "fund-pool-0.09",
+          "hash": "0x719edb8cd6128029d04543a3ec84c2c36b463c99004e702c0c4f55af66070b5a",
+          "nonce": 7,
+          "status": "confirmed",
+          "estimatedMaxFee": "0.00000716478",
+          "block": 120786384,
+          "feeWei": "5368140000000"
+        },
+        {
+          "label": "enable",
+          "hash": "0x023c2052c898af7d58ad2441ffb5aecdc3ac2c12497c94fb61bbbc17a473a69f",
+          "nonce": 8,
+          "status": "confirmed",
+          "estimatedMaxFee": "0.00000234144",
+          "block": 120786628,
+          "feeWei": "1635900000000"
+        }
+      ],
+      "address": "0x2E6B9b1AD827e8C91E1B355173D76d5770Bf5735",
+      "send": {
+        "confirmations": "20",
+        "requiredDVNs": [
+          "0x31F748a368a893Bdb5aBB67ec95F232507601A73",
+          "0xfD6865c841c2d64565562fCc7e05e619A30615f0"
+        ],
+        "optionalDVNs": []
+      },
+      "receive": {
+        "confirmations": "225000",
+        "requiredDVNs": [
+          "0x31F748a368a893Bdb5aBB67ec95F232507601A73",
+          "0xfD6865c841c2d64565562fCc7e05e619A30615f0"
+        ],
+        "optionalDVNs": []
+      },
+      "resultFee": "0.000329144223716954",
+      "configured": true,
+      "walletW3": "0.01",
+      "freeLiquidity": "0.09",
+      "nativeBalance": "0.001125215683588928",
+      "paused": false,
+      "totalFees": "0.00019911222"
+    }
+  },
+  "status": "deployed-configured-funded-enabled",
+  "checkedAt": "2026-09-09T01:01:07.737Z"
+}

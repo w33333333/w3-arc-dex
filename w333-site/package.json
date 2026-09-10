@@ -1,0 +1,28 @@
+{
+  "name": "one-bridge-test",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "compile": "node scripts/compile.mjs",
+    "test": "npm run compile && node --test test/*.test.mjs",
+    "build": "npm run compile && vite build",
+    "inspect": "node scripts/inspect.mjs",
+    "preview": "vite preview --host 127.0.0.1",
+    "test:fork": "npm run compile && node scripts/test-fork.mjs"
+  },
+  "dependencies": {
+    "ethers": "6.17.0"
+  },
+  "devDependencies": {
+    "ganache": "7.9.2",
+    "solc": "0.8.30",
+    "vite": "8.2.2",
+    "@layerzerolabs/lz-evm-messagelib-v2": "3.0.168",
+    "@layerzerolabs/lz-evm-protocol-v2": "3.0.168",
+    "@layerzerolabs/oapp-evm": "0.4.1",
+    "@openzeppelin/contracts": "5.4.0",
+    "solidity-bytes-utils": "0.8.4"
+  }
+}

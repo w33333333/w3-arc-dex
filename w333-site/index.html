@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="ARC 测试网 W3 DEX：V3 集中流动性、智能兑换与 W3 激励。"
+    />
+    <title>W3 DEX · ARC Testnet</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./v3.css" />
+    <link rel="stylesheet" href="./manage.css" />
+    <link rel="stylesheet" href="./detail.css" />
+    <link rel="stylesheet" href="./holders.css" />
+    <link rel="stylesheet" href="./feature-v21.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="W3 首页"
+        ><span class="wordmark">W3<span>.</span></span></a
+      >
+      <nav>
+        <button class="nav" data-panel="swap">兑换</button
+        ><button class="nav active" data-panel="liquidity">流动性</button
+        ><button class="nav" data-panel="rewards">W3 激励</button>
+      </nav>
+      <div class="network"><i></i> ARC Testnet</div>
+      <button id="connect" class="wallet">连接钱包</button>
+    </header>
+    <main>
+      <section id="swap" class="view">
+        <div class="swap-shell">
+          <div class="view-head">
+            <div>
+              <span class="eyebrow">SMART ROUTER</span>
+              <h1>兑换</h1>
+            </div>
+            <span id="status">等待连接</span>
+          </div>
+          <label class="token-box"
+            >支付
+            <div>
+              <input
+                id="amountIn"
+                inputmode="decimal"
+                placeholder="0.0"
+              /><select id="tokenIn">
+                <option value="USDC">USDC</option>
+                <option value="W3">W3</option>
+                <option value="custom">自定义 CA</option>
+              </select>
+              <span id="tokenInAddressWrap" class="token-ca-wrap">
+                <input id="tokenInAddress" placeholder="输入代币 CA" />
+              </span>
+            </div>
+            <small id="balanceIn">余额 —</small></label
+          ><button id="flip" class="flip" aria-label="交换代币方向">↓</button
+          ><label class="token-box"
+            >预计收到
+            <div>
+              <output id="amountOut">0.00000</output
+              ><select id="tokenOut">
+                <option value="W3">W3</option>
+                <option value="USDC">USDC</option>
+                <option value="custom">自定义 CA</option>
+              </select>
+              <span id="tokenOutAddressWrap" class="token-ca-wrap">
+                <input id="tokenOutAddress" placeholder="输入代币 CA" />
+              </span>
+            </div>
+            <small id="balanceOut">余额 —</small></label
+          >
+          <div class="route-line">
+            <span>路由</span
+            ><strong id="routeStatus">自动聚合三个流动性池</strong>
+          </div>
+          <div class="trade-settings">
+            <div class="setting-head">
+              <span>兑换滑点</span><strong id="slippageLabel">0.50%</strong>
+            </div>
+            <div class="slippage-options">
+              <button data-slip="0.1">0.1%</button
+              ><button class="active" data-slip="0.5">0.5%</button
+              ><button data-slip="1">1.0%</button
+              ><label
+                >自定义
+                <input id="customSlippage" inputmode="decimal" placeholder="%"
+              /></label>
+            </div>
+            <label class="mev-row"
+              ><span
+                ><b>MEV 保护</b
+                ><small>更紧滑点、短有效期和发送前重新报价</small></span
+              ><input id="mevToggle" type="checkbox" role="switch" /><i></i
+            ></label>
+            <p id="mevNotice" class="mev-notice">
+              保护模式不使用私有中继，无法保证完全避免抢跑或夹击。
+            </p>
+          </div>
+          <button id="swapButton" class="primary" disabled>
+            连接钱包后兑换
+          </button>
+        </div>
+        <aside class="side-card">
+          <h2>智能执行</h2>
+          <div><span>报价来源</span><strong>3 个费率池</strong></div>
+          <div><span>价格保护</span><strong id="sideSlip">0.50%</strong></div>
+          <div><span>MEV 模式</span><strong id="sideMev">关闭</strong></div>
+          <p>每次输入都会同时查询所有可用池，自动选择预计到账最多的路径。</p>
+        </aside>
+      </section>
+      <section id="liquidity" class="view liquidity-view active">
+        <div class="section-title" aria-hidden="true"></div>
+        <div class="liq-tabs">
+          <button class="active" data-liq-page="add">添加流动性</button
+          ><button data-liq-page="manage">管理流动性</button>
+        </div>
+        <div id="liqAdd" class="liq-subpage active">
+          <div class="pool-directory">
+            <div class="pool-table-head">
+              <span>流动性池</span><span>TVL</span><span>24H 交易量</span
+              ><span>24H 手续费</span><span>W3 激励</span><span>APR</span
+              ><span></span>
+            </div>
+            <div id="poolRows" class="pool-rows">
+              <div class="pool-loading">正在读取三个 V3 池…</div>
+            </div>
+          </div>
+          <div id="liquidityEditor" class="liquidity-grid editor-block">
+            <div class="setup-card">
+              <div class="step">
+                <b>1</b>
+                <div>
+                  <strong>网络与池类型</strong>
+                  <div class="static-select">
+                    <span><i></i> ARC Testnet</span><em>V3 集中流动性</em>
+                  </div>
+                </div>
+              </div>
+              <div class="step">
+                <b>2</b>
+                <div>
+                  <strong>代币对</strong>
+                  <div class="pair-row">
+                    <span class="asset usdc">$</span><span>USDC</span><i>+</i
+                    ><span class="asset w3">W3</span><span>W3</span>
+                  </div>
+                </div>
+              </div>
+              <div class="step">
+                <b>3</b>
+                <div>
+                  <strong>手续费等级</strong>
+                  <div class="tier-grid">
+                    <label
+                      ><input type="radio" name="liqFee" value="100" /><span
+                        ><b>0.01%</b><small>Tick 1</small></span
+                      ></label
+                    ><label
+                      ><input
+                        type="radio"
+                        name="liqFee"
+                        value="500"
+                        checked
+                      /><span><b>0.05%</b><small>Tick 10</small></span></label
+                    ><label
+                      ><input type="radio" name="liqFee" value="3000" /><span
+                        ><b>0.3%</b><small>Tick 60</small></span
+                      ></label
+                    >
+                  </div>
+                </div>
+              </div>
+              <div class="v3-note">
+                <b>只支持 V3</b
+                ><span>每个仓位会铸造成独立 NFT，可设置不同价格区间。</span>
+              </div>
+            </div>
+            <div class="position-card">
+              <div class="position-head">
+                <div>
+                  <span>USDC / W3</span
+                  ><small id="poolLabel">0.05% V3 池</small>
+                </div>
+                <span class="full-range">自定义区间</span>
+              </div>
+              <div class="depth-chart" id="depthChart" aria-label="V3 价格区间">
+                <div class="axis">
+                  <span>最低价</span><span>当前价</span><span>最高价</span>
+                </div>
+                <div class="range-track">
+                  <i id="rangeFill"></i><b id="priceMarker"></b>
+                </div>
+                <div class="current-price">
+                  <span>当前池价格</span><strong id="poolPrice">读取中…</strong>
+                </div>
+              </div>
+              <div class="range-title">
+                <strong>设置价格区间</strong><small>单位：USDC / W3</small>
+              </div>
+              <div class="range-inputs">
+                <label
+                  >最低价格<input
+                    id="minPrice"
+                    inputmode="decimal"
+                    placeholder="0.0008" /></label
+                ><label
+                  >最高价格<input
+                    id="maxPrice"
+                    inputmode="decimal"
+                    placeholder="0.0012"
+                /></label>
+              </div>
+              <div class="range-presets">
+                <button data-range="10">±10%</button
+                ><button class="active" data-range="20">±20%</button
+                ><button data-range="50">±50%</button
+                ><button data-range="full">全区间</button>
+              </div>
+              <div class="pool-stats">
+                <div>
+                  <span>当前 Tick</span><strong id="currentTick">—</strong>
+                </div>
+                <div>
+                  <span>池内流动性</span><strong id="poolLiquidity">—</strong>
+                </div>
+              </div>
+              <div class="deposit-box">
+                <label
+                  >USDC
+                  <div>
+                    <input
+                      id="liqUsdc"
+                      inputmode="decimal"
+                      placeholder="0.0"
+                    /><b>USDC</b>
+                  </div></label
+                ><label
+                  >W3 · 按当前价格自动匹配
+                  <div>
+                    <input id="liqW3" inputmode="decimal" placeholder="0.0" /><b
+                      >W3</b
+                    >
+                  </div></label
+                >
+              </div>
+              <p class="ratio-note">
+                输入 USDC 后自动按当前价格填充 W3；实际使用数量由所选区间决定。
+              </p>
+              <button id="addLiquidity" class="primary" disabled>
+                连接钱包后预览仓位
+              </button>
+            </div>
+          </div>
+        </div>
+        <div id="liqManage" class="liq-subpage">
+          <div class="manage-head">
+            <div>
+              <h2>我的 V3 流动性</h2>
+              <p>显示当前钱包持有的 USDC / W3 V3 仓位 NFT。</p>
+            </div>
+            <button id="refreshPositions" class="secondary">刷新</button>
+          </div>
+          <div class="position-table-head">
+            <span>流动性池</span><span>仓位</span><span>价格区间</span
+            ><span>APR</span><span>未领取</span><span>操作</span>
+          </div>
+          <div id="positionsList" class="positions-list">
+            <div class="empty-position">
+              <b>连接钱包后查看</b><span>这里会显示已添加的 V3 LP 仓位。</span>
+            </div>
+          </div>
+        </div>
+        <div id="poolDetail" class="pool-detail">
+          <button id="detailBack" class="back-link">← 返回流动性池</button>
+          <h1>流动性池详情</h1>
+          <div class="detail-top">
+            <div class="detail-identity">
+              <div class="pool-name">
+                <span class="token-stack large"><i>$</i><i>W3</i></span
+                ><span
+                  ><b>USDC / W3</b
+                  ><small id="detailFee">0.05% 手续费 · V3</small></span
+                >
+              </div>
+              <div class="contract-lines">
+                <span>USDC <code id="detailUsdcAddress"></code></span
+                ><span>W3 <code id="detailW3Address"></code></span
+                ><span>流动性池 <code id="detailPoolAddress"></code></span>
+              </div>
+            </div>
+            <div class="detail-actions">
+              <button id="detailTrade">兑换</button
+              ><button id="detailCreate">创建仓位 ＋</button>
+            </div>
+          </div>
+          <div class="detail-grid">
+            <div class="detail-chart">
+              <div class="chart-head">
+                <div>
+                  <span>总锁仓价值</span><strong id="detailTvl">—</strong
+                  ><small>当前链上快照</small>
+                </div>
+                <div class="periods">
+                  <button>1天</button><button>1周</button
+                  ><button class="active">1月</button><button>3月</button
+                  ><button>1年</button>
+                </div>
+              </div>
+              <div class="snapshot-chart">
+                <div class="snapshot-line"></div>
+                <b id="chartValue">—</b
+                ><span>ARC 测试网暂未接入历史数据索引</span>
+              </div>
+            </div>
+            <aside class="detail-side">
+              <div class="detail-card">
+                <h2>池内流动性</h2>
+                <strong id="detailSideTvl">—</strong><span>代币余额</span>
+                <div><b>USDC</b><em id="detailUsdcBalance">—</em></div>
+                <div><b>W3</b><em id="detailW3Balance">—</em></div>
+              </div>
+              <div class="detail-card">
+                <h2>统计数据</h2>
+                <div><span>当前价格</span><b id="detailPrice">—</b></div>
+                <div><span>费率</span><b id="detailFeeStat">—</b></div>
+                <div><span>池内流动性</span><b id="detailLiquidity">—</b></div>
+                <div><span>W3 每日激励</span><b id="detailEmission">—</b></div>
+                <div><span>24小时交易量</span><b>暂无索引</b></div>
+                <div><span>24小时手续费</span><b>暂无索引</b></div>
+              </div>
+            </aside>
+          </div>
+          <section class="holders-section">
+            <div class="holders-head">
+              <div>
+                <h2>LP 持有人</h2>
+                <p>当前费率池全部 V3 仓位持有人的公开链上信息。</p>
+              </div>
+              <strong id="holderCount">—</strong>
+            </div>
+            <div class="holders-table-head">
+              <span>持有人地址</span><span>仓位数量</span><span>总流动性</span
+              ><span>流动性占比</span><span>仓位 NFT</span>
+            </div>
+            <div id="holdersList" class="holders-list">
+              <div class="holders-loading">正在读取持有人…</div>
+            </div>
+          </section>
+        </div>
+      </section>
+      <section id="rewards" class="view">
+        <div class="incentive-page">
+          <div class="section-title">
+            <span class="eyebrow">W3 INCENTIVES</span>
+            <h1>W3 流动性激励</h1>
+            <p>任何人都可以为具体 V3 池添加 W3，固定 7 天按仓位产生的手续费占比分配。</p>
+          </div>
+          <div class="incentive-summary">
+            <div><span>分配方式</span><strong>手续费占比</strong></div>
+            <div><span>周期</span><strong>固定 7 天</strong></div>
+            <div><span>支持池</span><strong>3 个 V3 池</strong></div>
+            <div>
+              <span>我的待领取</span
+              ><strong id="myRewards">连接钱包查看</strong>
+            </div>
+          </div>
+          <div class="pool-directory">
+            <div class="incentive-head">
+              <span>流动性池</span><span>LP TVL</span><span>手续费</span
+              ><span>剩余激励</span><span></span>
+            </div>
+            <div id="incentiveRows" class="pool-rows">
+              <div class="pool-loading">正在读取激励计划…</div>
+            </div>
+          </div>
+          <div class="stake-panel">
+            <div>
+              <h2>参与手续费激励</h2>
+              <p>输入仓位 NFT 编号并质押，7 天结束后按该仓位新增手续费权重领取 W3。</p>
+            </div>
+            <select id="stakeFee">
+              <option value="100">0.01% 池</option>
+              <option value="500">0.05% 池</option>
+              <option value="3000">0.3% 池</option></select
+            ><input
+              id="stakeTokenId"
+              inputmode="numeric"
+              placeholder="NFT Token ID"
+            /><button id="stakePosition" class="primary" disabled>
+              连接钱包后质押</button
+            ><button id="claimW3" class="secondary" disabled>
+              领取 W3 奖励
+            </button>
+          </div>
+          <p class="incentive-warning">
+            测试网激励。质押会把仓位 NFT 转入手续费激励合约，周期结束并完成结算后可赎回。
+          </p>
+          <button id="watchW3" class="secondary watch-token" disabled>
+            添加 TestW3 到钱包
+          </button>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <span>ARC Testnet · Gas 使用 USDC · V3 测试合约未经审计</span>
+      <div>
+        <a
+          href="https://faucet.circle.com/?allow=true"
+          target="_blank"
+          rel="noreferrer"
+          >领取测试 USDC</a
+        ><a href="https://testnet.arcscan.app" target="_blank" rel="noreferrer"
+          >区块浏览器 ↗</a
+        >
+      </div>
+    </footer>
+    <dialog id="addIncentiveDialog">
+      <form method="dialog" class="confirm-card">
+        <div class="dialog-head">
+          <strong>添加 7 天 W3 激励</strong>
+          <button value="cancel" aria-label="关闭">×</button>
+        </div>
+        <p id="addIncentivePool">USDC / W3</p>
+        <label class="incentive-amount-label">
+          添加数量
+          <input id="addIncentiveAmount" inputmode="decimal" placeholder="0.0" />
+          <span>W3</span>
+        </label>
+        <p>提交后，此池激励结束时间统一更新为从当前交易起 7 天。</p>
+        <button id="confirmAddIncentive" type="button" class="primary">
+          授权并添加激励
+        </button>
+      </form>
+    </dialog>
+    <dialog id="confirmLiquidity">
+      <form method="dialog" class="confirm-card">
+        <div class="dialog-head">
+          <div>
+            <span class="eyebrow">CONFIRM POSITION</span
+            ><strong>确认添加流动性</strong>
+          </div>
+          <button value="cancel" aria-label="关闭">×</button>
+        </div>
+        <div class="confirm-pair">
+          <span>USDC / W3</span><b id="confirmFee">0.05%</b>
+        </div>
+        <div class="confirm-grid">
+          <div><span>当前价格</span><strong id="confirmPrice">—</strong></div>
+          <div><span>当前区间</span><strong id="confirmRange">—</strong></div>
+          <div><span>添加 USDC</span><strong id="confirmUsdc">—</strong></div>
+          <div><span>添加 W3</span><strong id="confirmW3">—</strong></div>
+        </div>
+        <p>钱包确认后将铸造一个新的 V3 仓位 NFT。</p>
+        <button id="confirmAdd" type="button" class="primary">确认并添加</button
+        ><button value="cancel" class="secondary">返回修改</button>
+      </form>
+    </dialog>
+    <dialog id="walletDialog">
+      <form method="dialog" class="wallet-dialog">
+        <div class="dialog-head">
+          <strong>连接钱包</strong
+          ><button value="cancel" aria-label="关闭">×</button>
+        </div>
+        <button id="connectOkx" type="button" class="wallet-choice">
+          <span class="okx-icon">OKX</span
+          ><span
+            ><b>OKX Wallet</b
+            ><small>优先使用 OKX 扩展或 App 内浏览器</small></span
+          ></button
+        ><button id="connectInjected" type="button" class="wallet-choice">
+          <span class="browser-icon">◇</span
+          ><span
+            ><b>浏览器钱包</b
+            ><small>MetaMask、Rabby 或其他 EVM 钱包</small></span
+          ></button
+        ><a
+          class="okx-link"
+          href="https://www.okx.com/download"
+          target="_blank"
+          rel="noreferrer"
+          >未检测到 OKX Wallet？打开官方下载页 ↗</a
+        >
+      </form>
+    </dialog>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+    <script src="./config.js?v=22"></script>
+    <script src="./app.js?v=22"></script>
+  </body>
+</html>

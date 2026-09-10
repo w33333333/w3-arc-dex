@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="canonical" href="https://w333.live/crosschain/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#f2f1e9" />
+    <title>W3 · 跨链</title>
+  </head>
+  <body>
+    <div id="app">
+      <header>
+        <a class="brand" href="#"
+          ><span class="brand-icon">↗</span> W3<span class="brand-dot"
+            >.</span
+          ></a
+        >
+        <nav><a href="/" class="nav">DEX</a>
+          <button data-tab="swap" class="nav active">兑换</button
+          ><button data-tab="orders" class="nav">
+            我的订单 <span id="order-count">0</span></button
+          ><button data-tab="setup" class="nav">库存管理</button>
+        </nav>
+        <button id="connect" class="wallet">连接钱包 <span>↗</span></button>
+      </header>
+      <main>
+        <section id="swap-view" class="view">
+          <div class="hero">
+            <div class="eyebrow">
+              <span class="dot"></span> W3 · 双链库存兑换
+            </div>
+            <h1>一枚 W3，<br />去另一条链。</h1>
+            <p>在 X Layer 与 BNB Chain 之间，<br />按 1:1 兑换现有 W3 代币。</p>
+            <div class="route-art" aria-hidden="true">
+              <span class="orb x">X</span
+              ><span class="route-line"><i></i><i></i><i></i><b>1:1</b></span
+              ><span class="orb b">◆</span>
+            </div>
+            <div class="hero-foot">
+              <span>无需铸造权限</span><span>双边预存库存</span
+              ><span>代币手续费 0</span>
+            </div>
+          </div>
+          <div class="swap-column">
+            <article class="swap-card">
+              <div class="card-title">
+                <h2>跨链兑换</h2>
+                <span class="chip">独立跨链</span>
+              </div>
+              <div id="readiness" class="notice">
+                正在读取链上合约状态…
+              </div>
+              <div class="asset-box">
+                <div class="asset-top">
+                  <label for="amount"
+                    >从 <strong id="source-name">X Layer</strong></label
+                  ><span>余额 <b id="balance">—</b></span>
+                </div>
+                <div class="amount-row">
+                  <input
+                    id="amount"
+                    inputmode="decimal"
+                    type="text"
+                    value="0.01"
+                    autocomplete="off"
+                    aria-label="兑换 W3 数量"
+                  /><span class="token"><i>W</i> W3</span>
+                </div>
+                <div class="asset-bottom">
+                  <span>单笔 0.000001–1 W3</span
+                  ><button id="set-small">填入 0.01</button>
+                </div>
+              </div>
+              <div class="flip-row">
+                <button id="flip" aria-label="切换兑换方向">↓↑</button>
+              </div>
+              <div class="asset-box destination">
+                <div class="asset-top">
+                  <span
+                    >到 <strong id="destination-name">BNB Chain</strong></span
+                  ><span>可用库存 <b id="liquidity">—</b></span>
+                </div>
+                <div class="amount-row">
+                  <output id="receive">0.01</output
+                  ><span class="token"><i>W</i> W3</span>
+                </div>
+                <div class="asset-bottom">
+                  <span>成功兑换时的净到账数量</span><span>1 W3 = 1 W3</span>
+                </div>
+              </div>
+              <div class="details">
+                <div>
+                  <span>收款地址</span
+                  ><b id="recipient">连接后使用同一钱包地址</b>
+                </div>
+                <div><span>费用</span><b>两次跨链消息费 + 链上 gas</b></div>
+                <div>
+                  <span>X Layer 消息确认</span><b>约 62.5 小时 · 非即时</b>
+                </div>
+                <div><span>首次注资计划</span><b>两边各 0.09 W3</b></div>
+              </div>
+              <button id="swap" class="primary full">连接钱包</button>
+              <p class="fine">
+                库存不足会拒绝订单；拒绝结果回传后可领回本金。网络费不退还。
+              </p>
+            </article>
+            <p class="below-card">
+              <span>↔</span> 自建兑换合约 · 使用 LayerZero 消息传递
+            </p>
+          </div>
+        </section>
+        <section id="orders-view" class="view hidden panel-view">
+          <div class="section-head">
+            <div class="eyebrow">TRACK YOUR TRANSFER</div>
+            <h1>每一步，都可追踪。</h1>
+            <p>
+              发起后等待目标链处理，再回传结果并领取。页面每 15 秒更新一次。
+            </p>
+          </div>
+          <div class="toolbar">
+            <button id="refresh-orders" class="secondary">刷新订单</button
+            ><button id="export-orders" class="secondary">导出订单备份</button
+            ><button id="import-order" class="secondary">从交易哈希恢复</button>
+          </div>
+          <div id="operator-test"></div>
+        <div id="orders"></div>
+        </section>
+        <section id="setup-view" class="view hidden panel-view">
+          <div class="section-head">
+            <div class="eyebrow">TEST CONTROL</div>
+            <h1>先用小额，走通全程。</h1>
+            <p>
+              使用钱包签名部署、绑定与注资。X Layer 需要 OKB，BNB Chain 需要
+              BNB。
+            </p>
+          </div>
+          <div class="notice warning">
+            这是未审计的实验合约。跨链依赖消息验证和送达；消息中断时不能仅凭超时退款。请仅投入可承受风险的小额资金。
+          </div>
+          <div class="setup-grid" id="setup-chains"></div>
+          <article class="settings">
+            <h2>启动与配置</h2>
+            <p>
+              部署默认暂停。两端绑定后，分别配置 LayerZero Labs + Nethermind
+              双验证器，再注资与开启。
+            </p>
+            <div class="notice warning">
+              确认时间：保留 X Layer 225,000 块确认，按本次链上观测约需 62.5
+              小时。BNB 方向的去程较快，但回传结算仍需等待 X Layer
+              确认。此版本不承诺即时跨链。
+            </div>
+            <label class="check"
+              ><input type="checkbox" id="risk-ack" />
+              我已阅读说明，了解这是主网小额实验，管理员仍能修改 LayerZero
+              安全配置。</label
+            >
+            <div class="toolbar">
+              <button id="check-route" class="secondary">检查双向路径</button
+              ><button id="enable" class="primary">开启两端兑换</button
+              ><button id="export-config" class="secondary">导出配置</button>
+            </div>
+            <pre id="route-report">尚未检查路径</pre>
+            <p class="fine">
+              当前浏览器配置可导出为 deployments.json，放入 public
+              后重新构建，供其他用户访问。不要把私钥填入网页或聊天。
+            </p>
+          </article>
+        </section>
+      </main>
+      <footer>
+        <span>W3</span><span id="network-label">钱包未连接</span
+        ><a href="https://layerzeroscan.com" target="_blank" rel="noreferrer"
+          >消息浏览器 ↗</a
+        >
+      </footer>
+    </div>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <dialog id="wallet-dialog">
+      <div class="dialog-top">
+        <h2>选择钱包</h2>
+        <button data-close="wallet-dialog" aria-label="关闭">×</button>
+      </div>
+      <div id="wallet-list"></div>
+      <p class="fine">
+        支持浏览器中的 OKX Wallet、MetaMask 等 EIP-1193 钱包。未集成
+        WalletConnect 扫码。
+      </p>
+    </dialog>
+    <dialog id="review-dialog">
+      <div class="dialog-top">
+        <h2>确认兑换</h2>
+        <button data-close="review-dialog" aria-label="关闭">×</button>
+      </div>
+      <div id="review"></div>
+      <button id="confirm-swap" class="primary full">授权并发起兑换</button>
+    </dialog>
+    <dialog id="restore-dialog">
+      <div class="dialog-top">
+        <h2>恢复订单</h2>
+        <button data-close="restore-dialog" aria-label="关闭">×</button>
+      </div>
+      <label
+        >发起网络<select id="restore-chain">
+          <option value="xlayer">X Layer</option>
+          <option value="bnb">BNB Chain</option>
+        </select></label
+      ><label>源链交易哈希<input id="restore-hash" placeholder="0x…" /></label
+      ><button id="restore" class="primary full">读取链上订单</button>
+    </dialog>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

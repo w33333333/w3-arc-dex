@@ -1,0 +1,74 @@
+{
+  "startedAt": "2026-09-09T01:01:53.662Z",
+  "source": "bnb",
+  "destination": "xlayer",
+  "amount": "0.01",
+  "user": "0x2A319D550C64e54DB5337c9291706E89fB72f62F",
+  "transactions": [
+    {
+      "chain": "bnb",
+      "label": "approve",
+      "hash": "0x0430379aa16b0a69554067a5eca3a4d584d83adbed88914c03017940898670b7",
+      "nonce": 9,
+      "status": "confirmed",
+      "valueWei": "0",
+      "feeWei": "2801940000000",
+      "block": 120786748
+    },
+    {
+      "chain": "bnb",
+      "label": "swap",
+      "hash": "0x9c3db6a06a11733303f6766175b4eb65388d3e4be010db3fcb115cf3ad9421e8",
+      "nonce": 10,
+      "status": "confirmed",
+      "valueWei": "362062248435179",
+      "feeWei": "23839380000000",
+      "block": 120786763
+    },
+    {
+      "chain": "xlayer",
+      "label": "relay-result",
+      "hash": "0xbd9769eff92e08c45586ce4966786823ecbcbccedce11c442b1c972fdbc0aeec",
+      "nonce": 9,
+      "status": "confirmed",
+      "valueWei": "2739436457372529",
+      "feeWei": "6345864264411",
+      "block": 70146724
+    },
+    {
+      "chain": "xlayer",
+      "label": "claim",
+      "hash": "0x60061737cd238f8a5d00b5efe459d52ce955eba316fe25a0c088343c72579413",
+      "nonce": 10,
+      "status": "confirmed",
+      "valueWei": "0",
+      "feeWei": "1395600058150",
+      "block": 70146730
+    }
+  ],
+  "quotedRequestFee": "0.000329147498577436",
+  "id": "0xa07aae25564ba4967bc9ffaa1a6dc243119e0d327880e1232580d8b38ceb6b79",
+  "guid": "0xf03f403b7bd9dfa85e604e2acf6ca5b7bac87a1724e2e5bd5e8ab33057fee4a0",
+  "sourceTx": "0x9c3db6a06a11733303f6766175b4eb65388d3e4be010db3fcb115cf3ad9421e8",
+  "inboundState": 3,
+  "outboundState": 1,
+  "status": "destination-claimed-result-pending",
+  "balances": {
+    "xlayer": {
+      "walletW3": "0.02",
+      "poolFree": "0.08",
+      "poolEscrowed": "0.0",
+      "poolReserved": "0.0",
+      "native": "0.007421563776902118"
+    },
+    "bnb": {
+      "walletW3": "0.0",
+      "poolFree": "0.09",
+      "poolEscrowed": "0.01",
+      "poolReserved": "0.0",
+      "native": "0.000767790965011492"
+    }
+  },
+  "checkedAt": "2026-09-09T01:02:52.071Z",
+  "quotedResultFee": "0.002490396779429572"
+}

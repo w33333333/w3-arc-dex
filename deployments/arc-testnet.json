@@ -1,0 +1,45 @@
+{
+  "network": "arcTestnet",
+  "chainId": 5042002,
+  "deployer": "0x1daCde546f8C91E8cC5047dD051495b57171602C",
+  "testW3": "0x8Cc53DDCCf52E0F63423f1fD254A7a41eE2075ba",
+  "usdc": "0x3600000000000000000000000000000000000000",
+  "factory": "0xD4FE3b9c6BD61235Eb742195969B51eB4850Be6F",
+  "router": "0x817bDBc1C62bA75617B10083Cb24b5cf5d7FBCcb",
+  "gaugeFactory": "0xf1552Dd10697b20064F0a9c6A4741d3064abC482",
+  "pools": {
+    "100": "0xcCEF0aE7B214EB8D391c2ac1Aa75947d5b2d61d3",
+    "500": "0xa5ADcC3Dc555523bf609Ffe55a9F11A455AACC63",
+    "3000": "0x8Fc34c62Fa1c649C4005c8FcB5f988903BC01663"
+  },
+  "gauges": {
+    "100": "0x3B90AF19C6c6872E55A1A9112FB5cEbB7043D279",
+    "500": "0x746560e3bCbDA226fBccf0bb32dF24172E1952E1",
+    "3000": "0x70f55706BB6b0B4515472BC74B42ABa11c0121E8"
+  },
+  "supportedFeePpm": [
+    100,
+    500,
+    3000
+  ],
+  "liquidity": {
+    "usdc": "1",
+    "w3": "1000",
+    "stakedLpWei": "15811388300341"
+  },
+  "testedSwap": {
+    "transaction": "0x57b1aa298f119df1b13b5ab64a7ab45326116a3308207894d1d34a2b8dbfdeb4",
+    "amountInW3": "1",
+    "amountOutUsdc": "0.000998"
+  },
+  "testedReward": {
+    "claimTransaction": "0x653612d83fb3d4744ecae0f4e78d4a88a0db2e3ba5e93bd4d6eebafdf2442432",
+    "fundedW3": "70",
+    "durationSeconds": 70,
+    "claimedW3": "2.999999999999999999"
+  },
+  "nativeUsdcAfter": "16.690471153125",
+  "testedAt": "2026-09-09T23:42:47.196Z",
+  "allFeePoolsReady": true,
+  "updatedAt": "2026-09-09T23:44:27.843Z"
+}

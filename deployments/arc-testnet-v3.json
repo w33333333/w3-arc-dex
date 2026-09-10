@@ -1,0 +1,79 @@
+{
+  "network": "arcTestnet",
+  "chainId": 5042002,
+  "deployer": "0x1daCde546f8C91E8cC5047dD051495b57171602C",
+  "usdc": "0x3600000000000000000000000000000000000000",
+  "testW3": "0x8Cc53DDCCf52E0F63423f1fD254A7a41eE2075ba",
+  "factory": "0x6c0eE6cE147a7c04b7052E46b2D3E5fd44438547",
+  "wrappedNativePlaceholder": "0x879A647E26f4F4c4a1c9a70d396b583984650162",
+  "positionDescriptor": "0x1d22Ca5F689b3Ca36e4902128831e5B6cD2Fca99",
+  "positionManager": "0xc8C6717Cb68B2A9AEcE47C09eE83cF5EE23c2786",
+  "swapRouter": "0xEb88A9133DD51E6fA0DE9477b8b376E18E9AB28E",
+  "quoterV2": "0x31b22F5eBA79247aeFF3c295FbFE9Ac01A3198E7",
+  "staker": "0x2C5B1BA932457cDD0A73F436c19866E636D8A6cf",
+  "pools": {
+    "100": "0x5416b3461eF7C9dF1360f643b0dce50967C6CE65",
+    "500": "0x7881d27CEBECA5b00F90BfC8e39B2b0719C4c135",
+    "3000": "0xA894C3CA37db8EF2DeE2D0D01E028ebb66857857"
+  },
+  "seedPositions": {
+    "100": {
+      "tokenId": "1",
+      "tickLower": 345305,
+      "tickUpper": 345505
+    },
+    "500": {
+      "tokenId": "2",
+      "tickLower": 344410,
+      "tickUpper": 346410
+    },
+    "3000": {
+      "tokenId": "3",
+      "tickLower": 339420,
+      "tickUpper": 351420
+    }
+  },
+  "supportedFeePpm": [
+    100,
+    500,
+    3000
+  ],
+  "tickSpacings": {
+    "100": 1,
+    "500": 10,
+    "3000": 60
+  },
+  "initialPrice": "1 W3 = 0.001 USDC",
+  "testedSwap": {
+    "amountInW3": "1",
+    "amountOutUsdc": "0.000999"
+  },
+  "testedAt": "2026-09-10T00:16:35.486Z",
+  "incentives": {
+    "100": {
+      "rewardToken": "0x8Cc53DDCCf52E0F63423f1fD254A7a41eE2075ba",
+      "pool": "0x5416b3461eF7C9dF1360f643b0dce50967C6CE65",
+      "startTime": 1789000896,
+      "endTime": 1791592896,
+      "refundee": "0x1daCde546f8C91E8cC5047dD051495b57171602C",
+      "rewardWei": "100000000000000000000000"
+    },
+    "500": {
+      "rewardToken": "0x8Cc53DDCCf52E0F63423f1fD254A7a41eE2075ba",
+      "pool": "0x7881d27CEBECA5b00F90BfC8e39B2b0719C4c135",
+      "startTime": 1789000896,
+      "endTime": 1791592896,
+      "refundee": "0x1daCde546f8C91E8cC5047dD051495b57171602C",
+      "rewardWei": "100000000000000000000000"
+    },
+    "3000": {
+      "rewardToken": "0x8Cc53DDCCf52E0F63423f1fD254A7a41eE2075ba",
+      "pool": "0xA894C3CA37db8EF2DeE2D0D01E028ebb66857857",
+      "startTime": 1789000896,
+      "endTime": 1791592896,
+      "refundee": "0x1daCde546f8C91E8cC5047dD051495b57171602C",
+      "rewardWei": "100000000000000000000000"
+    }
+  },
+  "incentivesStartedAt": "2026-09-10T00:39:47.845Z"
+}

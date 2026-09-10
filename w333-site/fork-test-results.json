@@ -1,0 +1,52 @@
+{
+  "checkedAt": "2026-09-09T00:38:06.879Z",
+  "mode": "LOCAL FORKS ONLY; no mainnet writes",
+  "chains": {
+    "xlayer": {
+      "success": true,
+      "send": {
+        "confirmations": "225000",
+        "requiredDVNs": [
+          "0x28af4dADbc5066e994986E8bb105240023dC44B6",
+          "0x9C061c9A4782294eeF65ef28Cb88233A987F4bdD"
+        ],
+        "optionalDVNs": []
+      },
+      "receive": {
+        "confirmations": "20",
+        "requiredDVNs": [
+          "0x28af4dADbc5066e994986E8bb105240023dC44B6",
+          "0x9C061c9A4782294eeF65ef28Cb88233A987F4bdD"
+        ],
+        "optionalDVNs": []
+      },
+      "executor": "0xcCE466a522984415bC91338c232d98869193D46e",
+      "resultFee": "0.002490396779429572",
+      "swapFee": "0.002490744822457724",
+      "currency": "OKB"
+    },
+    "bnb": {
+      "success": true,
+      "send": {
+        "confirmations": "20",
+        "requiredDVNs": [
+          "0x31F748a368a893Bdb5aBB67ec95F232507601A73",
+          "0xfD6865c841c2d64565562fCc7e05e619A30615f0"
+        ],
+        "optionalDVNs": []
+      },
+      "receive": {
+        "confirmations": "225000",
+        "requiredDVNs": [
+          "0x31F748a368a893Bdb5aBB67ec95F232507601A73",
+          "0xfD6865c841c2d64565562fCc7e05e619A30615f0"
+        ],
+        "optionalDVNs": []
+      },
+      "executor": "0x3ebD570ed38B1b3b4BC886999fcF507e9D584859",
+      "resultFee": "0.000329144223716954",
+      "swapFee": "0.000329147498577436",
+      "currency": "BNB"
+    }
+  }
+}

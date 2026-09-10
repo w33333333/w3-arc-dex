@@ -1,0 +1,27 @@
+{
+  "checkedAt": "2026-09-09T00:29:30.076Z",
+  "chains": {
+    "xlayer": {
+      "chainId": 196,
+      "block": 70144734,
+      "token": "0x5164b016ef0778076f6acd24436f84d3c3aa91dc",
+      "symbol": "W3",
+      "decimals": 18,
+      "codeHash": "0x77707c405d225cee5f7e7b3a13be373fd514fe3269ee90e141ef41f546ca42e3",
+      "codeBytes": 2781,
+      "endpointEid": 30274,
+      "endpointMatches": true
+    },
+    "bnb": {
+      "chainId": 56,
+      "block": 120782424,
+      "token": "0x71d912f1b3e6a559f6f34da4689a0901a7b37214",
+      "symbol": "W3",
+      "decimals": 18,
+      "codeHash": "0xfe9e00c6705490135cf56c8992cc927e54f210254961a710df2d1a420d6ffc74",
+      "codeBytes": 2807,
+      "endpointEid": 30102,
+      "endpointMatches": true
+    }
+  }
+}

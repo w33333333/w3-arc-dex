@@ -1,0 +1,53 @@
+.token-box > div {
+  flex-wrap: wrap;
+}
+
+.token-ca-wrap {
+  display: none;
+  flex: 1 0 100%;
+  margin: 0 !important;
+  padding-top: 6px;
+}
+
+.token-ca-wrap input {
+  width: 100%;
+  border: 1px solid var(--line) !important;
+  border-radius: 9px !important;
+  padding: 10px 12px !important;
+  font-size: 0.82rem !important;
+}
+
+.market-periods {
+  display: flex;
+  gap: 6px;
+}
+
+.market-periods button {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.market-periods button.active {
+  border-color: var(--cyan);
+  background: color-mix(in srgb, var(--cyan) 16%, transparent);
+  color: var(--text);
+}
+
+@media (max-width: 650px) {
+  .market-toolbar {
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .market-periods {
+    width: 100%;
+  }
+
+  .market-periods button {
+    flex: 1;
+  }
+}
