@@ -84,6 +84,14 @@ const toast = (m) => {
   e.classList.add("show");
   setTimeout(() => e.classList.remove("show"), 3200);
 };
+function readableTxError(error, fallback = "交易失败") {
+  const message = String(error?.shortMessage || error?.reason || error?.message || "");
+  if (/\bSTF\b|safeTransferFrom|transfer from failed/i.test(message))
+    return "代币转账失败，请检查 USDC/W3 余额和授权后重试";
+  if (/insufficient funds/i.test(message)) return "USDC Gas 余额不足";
+  if (/user rejected|ACTION_REJECTED|code=4001/i.test(message)) return "已取消交易";
+  return message || fallback;
+}
 const fee = (n) =>
     Number(document.querySelector(`input[name=${n}]:checked`).value),
   feeLabel = (f) => (f === 100 ? "0.01%" : f === 500 ? "0.05%" : "0.3%");
@@ -872,7 +880,7 @@ async function txButton(b, work) {
     await refresh();
     await loadPool();
   } catch (e) {
-    toast(e.shortMessage || e.message || "交易失败");
+    toast(readableTxError(e));
   } finally {
     b.disabled = false;
     b.textContent = old;
@@ -1120,12 +1128,21 @@ $("confirmAdd").onclick = async () => {
       [C.w3, b],
     ]) {
       const t = new ethers.Contract(token, ERC20, signer);
+      const symbol = token.toLowerCase() === C.usdc.toLowerCase() ? "USDC" : "W3";
+      const decimals = symbol === "USDC" ? 6 : 18;
+      const balance = await t.balanceOf(account);
+      if (balance < amt) {
+        const missing = ethers.formatUnits(amt - balance, decimals);
+        throw Error(`${symbol} 余额不足，还缺少 ${missing} ${symbol}`);
+      }
       if ((await t.allowance(account, C.positionManager)) < amt) {
         const q = await t.approve(C.positionManager, ethers.MaxUint256);
         await q.wait();
+        if ((await t.allowance(account, C.positionManager)) < amt)
+          throw Error(`${symbol} 授权未生效，请重新授权`);
       }
     }
-    return m.mint({
+    const params = {
       token0: C.usdc,
       token1: C.w3,
       fee: f,
@@ -1136,7 +1153,13 @@ $("confirmAdd").onclick = async () => {
       amount1Min: 0,
       recipient: account,
       deadline: Math.floor(Date.now() / 1000) + 1200,
-    });
+    };
+    try {
+      await m.mint.staticCall(params);
+    } catch (error) {
+      throw Error(readableTxError(error, "仓位创建模拟失败"));
+    }
+    return m.mint(params);
   });
   await loadPositions();
   await refreshLiquidityBalances();
