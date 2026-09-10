@@ -16,6 +16,7 @@
   padding: 10px 12px !important;
   font-size: 0.82rem !important;
 }
+.token-detected{display:block;margin:7px 2px 0;color:#5e793d!important;font-size:.76rem!important}.token-detected.error{color:#a55c50!important}
 
 .market-periods {
   display: flex;

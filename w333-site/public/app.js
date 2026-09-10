@@ -21,6 +21,7 @@ const tokenInfoCache = new Map();
 const tokenAbi = [
   "function decimals() view returns(uint8)",
   "function symbol() view returns(string)",
+  "function name() view returns(string)",
   "function balanceOf(address) view returns(uint256)",
 ];
 const PRICE_DIGITS = 5;
@@ -107,11 +108,11 @@ function clearMarketPair() {
   if ($("marketPair") && tokenMode("Out") && tokenMode("In")) {
     const i =
       tokenMode("In") === "custom"
-        ? ($("tokenInAddress")?.value || "自定义代币").slice(0, 6)
+        ? ($("tokenInAddress")?.dataset.symbol || ($("tokenInAddress")?.value || "自定义代币").slice(0, 6))
         : tokenMode("In");
     const o =
       tokenMode("Out") === "custom"
-        ? ($("tokenOutAddress")?.value || "自定义代币").slice(0, 6)
+        ? ($("tokenOutAddress")?.dataset.symbol || ($("tokenOutAddress")?.value || "自定义代币").slice(0, 6))
         : tokenMode("Out");
     if ($("marketPair")) $("marketPair").textContent = `${o} / ${i}`;
   }
@@ -124,22 +125,48 @@ async function resolveToken(side) {
   const address = ethers.getAddress(key);
   const cached = tokenInfoCache.get(address);
   if (cached) return cached;
-  let info = { symbol: "", address, decimals: 18 };
+  const code = await provider.getCode(address);
+  if (code === "0x") throw Error("该地址不是 ARC 链代币合约");
+  let info = { symbol: "", name: "", address, decimals: 18 };
   const contract = new ethers.Contract(address, tokenAbi, provider);
-  try {
-    info.decimals = Number(await contract.decimals());
-    info.symbol = await contract
-      .symbol()
-      .catch(() => `Token(${address.slice(0, 6)}...)`);
-  } catch (infoError) {
-    if (infoError.code !== -32603 && infoError.code !== -32000) {
-      /* ignore */
-    }
-  }
-  if (!/^[A-Z0-9]+$/.test(info.symbol))
-    info.symbol = `Token (${address.slice(0, 6)}...)`;
+  const [decimals, symbol, name] = await Promise.allSettled([
+    contract.decimals(),
+    contract.symbol(),
+    contract.name(),
+  ]);
+  if (decimals.status !== "fulfilled") throw Error("无法读取代币精度");
+  info.decimals = Number(decimals.value);
+  info.symbol = symbol.status === "fulfilled" ? String(symbol.value).trim() : "";
+  info.name = name.status === "fulfilled" ? String(name.value).trim() : "";
+  if (!info.symbol) info.symbol = `TOKEN-${address.slice(2, 6).toUpperCase()}`;
   tokenInfoCache.set(address, info);
   return info;
+}
+async function identifyCustomToken(side) {
+  const input = $(`token${side}Address`),
+    detected = $(`token${side}Detected`),
+    option = $(`token${side}`).querySelector('option[value="custom"]');
+  if (!input.value.trim()) {
+    input.dataset.symbol = "";
+    detected.textContent = "";
+    detected.classList.remove("error");
+    option.textContent = "自定义 CA";
+    return;
+  }
+  detected.textContent = "正在识别 ARC 链代币…";
+  detected.classList.remove("error");
+  try {
+    const token = await resolveToken(side);
+    input.dataset.symbol = token.symbol;
+    option.textContent = token.symbol;
+    detected.textContent = `${token.name || token.symbol} · ${token.symbol} · ${token.decimals} 位精度`;
+    clearMarketPair();
+  } catch (error) {
+    input.dataset.symbol = "";
+    option.textContent = "自定义 CA";
+    detected.textContent = error.message || "无法识别该代币";
+    detected.classList.add("error");
+  }
 }
 function tokenAddressByKey(key) {
   return key === "USDC"
@@ -899,12 +926,14 @@ $("tokenIn").onchange = () => {
     $("tokenOut").value = $("tokenIn").value === "USDC" ? "W3" : "USDC";
   setTokenFieldVisibility("In");
   setTokenFieldVisibility("Out");
+  if ($("tokenIn").value === "custom") identifyCustomToken("In");
   clearMarketPair();
   refresh();
   quote();
 };
 $("tokenOut").onchange = () => {
   setTokenFieldVisibility("Out");
+  if ($("tokenOut").value === "custom") identifyCustomToken("Out");
   clearMarketPair();
   refresh();
   quote();
@@ -914,7 +943,8 @@ for (const id of ["tokenInAddress", "tokenOutAddress"]) {
   $(id).oninput = () => {
     clearTimeout(timer);
     clearMarketPair();
-    timer = setTimeout(() => {
+    timer = setTimeout(async () => {
+      await identifyCustomToken(id.includes("In") ? "In" : "Out");
       refresh();
       quote();
     }, 350);
@@ -929,6 +959,8 @@ $("flip").onclick = () => {
   $("tokenOutAddress").value = ca;
   setTokenFieldVisibility("In");
   setTokenFieldVisibility("Out");
+  if ($("tokenIn").value === "custom") identifyCustomToken("In");
+  if ($("tokenOut").value === "custom") identifyCustomToken("Out");
   clearMarketPair();
   refresh();
   quote();
