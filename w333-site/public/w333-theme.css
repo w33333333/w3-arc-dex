@@ -7,6 +7,7 @@ main{max-width:1200px}.swap-shell,.side-card,.setup-card,.position-card,.rewards
 footer{border-color:#dedfd5;color:#7b8074}footer a{color:#5e793d}.crosschain-nav{display:inline-flex;align-items:center;text-decoration:none}
 .token-stack i:first-child,.asset.usdc{color:transparent!important;font-size:0!important;background:#0b53bf url("./usdc-token.svg") center/cover no-repeat!important;border-color:transparent!important}
 .step>b{background:var(--lime)!important;color:#20241d!important;box-shadow:0 0 0 1px #bfdc52}
+.deposit-label{display:flex;align-items:center;justify-content:space-between;gap:12px}.deposit-label small{color:var(--blue);font-size:.76rem;font-weight:650;text-align:right}
 @media(max-width:850px){.topbar{height:76px;padding:0 16px}.crosschain-nav{padding:10px 15px}}
 
 /* Eliminate legacy dark surfaces, including transient loading and empty states. */

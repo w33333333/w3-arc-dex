@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="./detail.css" />
     <link rel="stylesheet" href="./holders.css" />
     <link rel="stylesheet" href="./feature-v21.css" />
-    <link rel="stylesheet" href="./w333-theme.css?v=32" />
+    <link rel="stylesheet" href="./w333-theme.css?v=33" />
   </head>
   <body>
     <header class="topbar">
@@ -238,7 +238,7 @@
               </div>
               <div class="deposit-box">
                 <label
-                  >USDC
+                  ><span class="deposit-label"><span>USDC</span><small id="liqBalanceUsdc">余额 —</small></span>
                   <div>
                     <input
                       id="liqUsdc"
@@ -247,7 +247,7 @@
                     /><b>USDC</b>
                   </div></label
                 ><label
-                  >W3 · 按当前价格自动匹配
+                  ><span class="deposit-label"><span>W3 · 按当前价格自动匹配</span><small id="liqBalanceW3">余额 —</small></span>
                   <div>
                     <input id="liqW3" inputmode="decimal" placeholder="0.0" /><b
                       >W3</b
@@ -497,12 +497,12 @@
     </dialog>
     <div id="toast" role="status" aria-live="polite"></div>
     <script src="./ethers-6.13.4.min.js" defer></script>
-    <script src="./config.js?v=32" defer></script>
-    <script src="./app.js?v=32" defer></script>
+    <script src="./config.js?v=33" defer></script>
+    <script src="./app.js?v=33" defer></script>
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
-          setTimeout(() => navigator.serviceWorker.register("./sw.js?v=32"), 2500);
+          setTimeout(() => navigator.serviceWorker.register("./sw.js?v=33"), 2500);
         });
       }
     </script>

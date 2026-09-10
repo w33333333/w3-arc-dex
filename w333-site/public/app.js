@@ -279,6 +279,30 @@ async function refresh() {
       $(id).textContent = "余额 —";
     }
   }
+  await refreshLiquidityBalances();
+}
+async function refreshLiquidityBalances() {
+  if (!account) {
+    $("liqBalanceUsdc").textContent = "余额 —";
+    $("liqBalanceW3").textContent = "余额 —";
+    return;
+  }
+  const assets = [
+    ["liqBalanceUsdc", C.usdc, 6, "USDC"],
+    ["liqBalanceW3", C.w3, 18, "W3"],
+  ];
+  await Promise.all(
+    assets.map(async ([id, address, decimals, symbol]) => {
+      try {
+        const balance = await buildERC20Contract(address).balanceOf(account);
+        $(id).textContent = `余额 ${Number(
+          ethers.formatUnits(balance, decimals),
+        ).toLocaleString(undefined, { maximumFractionDigits: 6 })} ${symbol}`;
+      } catch {
+        $(id).textContent = "余额 —";
+      }
+    }),
+  );
 }
 async function bestQuote(amount, tokenIn, tokenOut) {
   const q = new ethers.Contract(C.quoterV2, QUOTER, provider),
@@ -1115,6 +1139,7 @@ $("confirmAdd").onclick = async () => {
     });
   });
   await loadPositions();
+  await refreshLiquidityBalances();
   pendingMint = null;
 };
 $("stakePosition").onclick = async () => {

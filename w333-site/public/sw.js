@@ -1,4 +1,4 @@
-const CACHE_NAME = "w3-dex-shell-v32";
+const CACHE_NAME = "w3-dex-shell-v33";
 const SHELL = [
   "./",
   "./index.html",
@@ -8,10 +8,10 @@ const SHELL = [
   "./detail.css",
   "./holders.css",
   "./feature-v21.css",
-  "./w333-theme.css?v=32",
+  "./w333-theme.css?v=33",
   "./usdc-token.svg",
-  "./config.js?v=32",
-  "./app.js?v=32",
+  "./config.js?v=33",
+  "./app.js?v=33",
   "./ethers-6.13.4.min.js",
 ];
 
