@@ -363,29 +363,32 @@ async function loadPool() {
 async function loadPoolDirectory() {
   const rows = $("poolRows"),
     usdc = new ethers.Contract(C.usdc, ERC20, provider),
-    w3 = new ethers.Contract(C.w3, ERC20, provider);
+    w3 = new ethers.Contract(C.w3, ERC20, provider),
+    rewards = new ethers.Contract(C.feeRewards, FEE_REWARDS, provider);
   try {
     const data = await Promise.all(
       FEES.map(async (f) => {
         const pool = C.pools[f],
           p = new ethers.Contract(pool, POOL, provider),
-          [slot, liq, u, w] = await Promise.all([
+          [slot, liq, u, w, rewardInfo] = await Promise.all([
             p.slot0(),
             p.liquidity(),
             usdc.balanceOf(pool),
             w3.balanceOf(pool),
+            rewards.campaignInfo(pool).catch(() => null),
           ]),
           price = priceAtTick(Number(slot[1])),
           tvl =
             Number(ethers.formatUnits(u, 6)) +
             Number(ethers.formatEther(w)) * price,
-          campaign = C.incentives?.[f],
+          campaign = rewardInfo?.[1],
+          remaining = campaign
+            ? Number(ethers.formatEther(campaign.reward - campaign.claimed))
+            : 0,
           duration = campaign
-            ? (campaign.endTime - campaign.startTime) / 86400
+            ? Math.max(0, (Number(campaign.end) - Date.now() / 1000) / 86400)
             : 0,
-          daily = campaign
-            ? Number(ethers.formatEther(campaign.rewardWei)) / duration
-            : 0,
+          daily = duration > 0 ? remaining / duration : 0,
           apr = tvl && daily ? ((daily * price * 365) / tvl) * 100 : 0;
         poolState[f] = {
           tick: Number(slot[1]),
@@ -393,12 +396,21 @@ async function loadPoolDirectory() {
           liquidity: liq,
           tvl,
           daily,
+          remaining,
           apr,
           usdcBalance: Number(ethers.formatUnits(u, 6)),
           w3Balance: Number(ethers.formatEther(w)),
           pool,
         };
-        return { f, tvl, daily, apr, campaign };
+        const cutoff = Date.now() / 1000 - 86400,
+          recentTrades = marketPoints.filter(
+            (trade) => trade.fee === f && trade.timestamp >= cutoff,
+          ),
+          volume24h = recentTrades.reduce((sum, trade) => sum + trade.usdc, 0),
+          fees24h = volume24h * f / 1_000_000;
+        poolState[f].volume24h = volume24h;
+        poolState[f].fees24h = fees24h;
+        return { f, tvl, daily, remaining, apr, campaign, volume24h, fees24h };
       }),
     );
     rows.innerHTML = data
@@ -410,10 +422,14 @@ async function loadPoolDirectory() {
           x.f +
           '">详情</button></div><div class="metric"><small>TVL</small><b>$' +
           x.tvl.toLocaleString(undefined, { maximumFractionDigits: 2 }) +
-          '</b></div><div class="metric"><small>24H 交易量</small><b title="ARC RPC 暂无稳定的 24H 索引">—</b></div><div class="metric"><small>24H 手续费</small><b class="green" title="ARC RPC 暂无稳定的 24H 索引">—</b></div><div class="metric"><small>W3 激励</small><b class="green">' +
+          '</b></div><div class="metric"><small>24H 交易量</small><b>$' +
+          x.volume24h.toLocaleString(undefined, { maximumFractionDigits: 5 }) +
+          '</b></div><div class="metric"><small>24H 手续费</small><b class="green">$' +
+          x.fees24h.toLocaleString(undefined, { maximumFractionDigits: 5 }) +
+          '</b></div><div class="metric"><small>剩余 W3 激励</small><b class="green">' +
           (x.campaign
-            ? x.daily.toLocaleString(undefined, { maximumFractionDigits: 0 }) +
-              " W3/天"
+            ? x.remaining.toLocaleString(undefined, { maximumFractionDigits: 5 }) +
+              " W3"
             : "—") +
           '</b></div><div class="metric"><small>APR</small><b class="purple">' +
           (x.apr ? x.apr.toFixed(2) + "%" : "—") +
@@ -528,7 +544,11 @@ async function showPoolDetail(f) {
   $("detailFeeStat").textContent = feeLabel(f);
   $("detailLiquidity").textContent = s.liquidity.toString();
   $("detailEmission").textContent =
-    s.daily.toLocaleString(undefined, { maximumFractionDigits: 0 }) + " W3/天";
+    s.remaining.toLocaleString(undefined, { maximumFractionDigits: 5 }) + " W3";
+  $("detailVolume24h").textContent =
+    "$" + s.volume24h.toLocaleString(undefined, { maximumFractionDigits: 5 });
+  $("detailFees24h").textContent =
+    "$" + s.fees24h.toLocaleString(undefined, { maximumFractionDigits: 5 });
   $("detailCreate").dataset.fee = f;
   await loadHolders(f);
 }
@@ -794,7 +814,16 @@ document.querySelectorAll(".nav").forEach(
       if (n.dataset.panel === "liquidity") {
         if ($("poolDetail").classList.contains("active"))
           $("detailBack").click();
-        loadPool();
+        const page = n.dataset.liqNav || "add";
+        document
+          .querySelectorAll("[data-liq-page],.liq-subpage")
+          .forEach((x) => x.classList.remove("active"));
+        document
+          .querySelector('[data-liq-page="' + page + '"]')
+          ?.classList.add("active");
+        $(page === "add" ? "liqAdd" : "liqManage").classList.add("active");
+        if (page === "manage") loadPositions();
+        else loadPool();
       }
     }),
 );
@@ -1222,9 +1251,7 @@ theme.href = "./w333-theme.css";
 document.head.append(theme);
 const dexNav = document.querySelector(".topbar nav"),
   swapNav = dexNav?.querySelector('[data-panel="swap"]'),
-  liquidityNav = dexNav?.querySelector('[data-panel="liquidity"]');
-if (dexNav && swapNav && liquidityNav)
-  dexNav.insertBefore(liquidityNav, swapNav);
+  liquidityNav = dexNav?.querySelector('[data-liq-nav="add"]');
 const crosschain = document.createElement("a");
 crosschain.href = "/crosschain/";
 crosschain.className = "nav crosschain-nav";
@@ -2037,6 +2064,7 @@ async function loadMarketHistory(force = false) {
     marketPoints.sort((a, b) => a.block - b.block || a.index - b.index);
     renderMarketChart();
     renderIncentives();
+    if ($("liquidity").classList.contains("active")) await loadPoolDirectory();
   } catch {
     $("candleChart").innerHTML =
       '<div class="chart-loading">K 线读取失败，请稍后刷新。</div>';
@@ -2224,9 +2252,5 @@ document
 loadMarketHistory();
 $('stakeTokenId').addEventListener("input", refreshRewards);
 setInterval(() => {
-  if (
-    document.visibilityState === "visible" &&
-    document.querySelector('[data-panel="swap"]').classList.contains("active")
-  )
-    loadMarketHistory(true);
-}, 60000);
+  if (document.visibilityState === "visible") loadMarketHistory(true);
+}, 30000);

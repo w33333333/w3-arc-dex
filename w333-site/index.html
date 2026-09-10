@@ -21,8 +21,9 @@
         ><span class="wordmark">W3<span>.</span></span></a
       >
       <nav>
-        <button class="nav" data-panel="swap">兑换</button
-        ><button class="nav active" data-panel="liquidity">流动性</button
+        <button class="nav active" data-panel="liquidity" data-liq-nav="add">添加流动性</button
+        ><button class="nav" data-panel="liquidity" data-liq-nav="manage">管理流动性</button
+        ><button class="nav" data-panel="swap">兑换</button
         ><button class="nav" data-panel="rewards">W3 激励</button>
       </nav>
       <div class="network"><i></i> ARC Testnet</div>
@@ -112,7 +113,7 @@
       </section>
       <section id="liquidity" class="view liquidity-view active">
         <div class="section-title" aria-hidden="true"></div>
-        <div class="liq-tabs">
+        <div class="liq-tabs nav-moved" aria-hidden="true">
           <button class="active" data-liq-page="add">添加流动性</button
           ><button data-liq-page="manage">管理流动性</button>
         </div>
@@ -120,7 +121,7 @@
           <div class="pool-directory">
             <div class="pool-table-head">
               <span>流动性池</span><span>TVL</span><span>24H 交易量</span
-              ><span>24H 手续费</span><span>W3 激励</span><span>APR</span
+              ><span>24H 手续费</span><span>剩余 W3 激励</span><span>APR</span
               ><span></span>
             </div>
             <div id="poolRows" class="pool-rows">
@@ -326,9 +327,9 @@
                 <div><span>当前价格</span><b id="detailPrice">—</b></div>
                 <div><span>费率</span><b id="detailFeeStat">—</b></div>
                 <div><span>池内流动性</span><b id="detailLiquidity">—</b></div>
-                <div><span>W3 每日激励</span><b id="detailEmission">—</b></div>
-                <div><span>24小时交易量</span><b>暂无索引</b></div>
-                <div><span>24小时手续费</span><b>暂无索引</b></div>
+                <div><span>剩余 W3 激励</span><b id="detailEmission">—</b></div>
+                <div><span>24小时交易量</span><b id="detailVolume24h">—</b></div>
+                <div><span>24小时手续费</span><b id="detailFees24h">—</b></div>
               </div>
             </aside>
           </div>
@@ -487,7 +488,7 @@
     </dialog>
     <div id="toast" role="status" aria-live="polite"></div>
     <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
-    <script src="./config.js?v=23"></script>
-    <script src="./app.js?v=23"></script>
+    <script src="./config.js?v=24"></script>
+    <script src="./app.js?v=24"></script>
   </body>
 </html>
