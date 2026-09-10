@@ -191,7 +191,9 @@
                   <span>最低价</span><span>当前价</span><span>最高价</span>
                 </div>
                 <div class="range-track">
-                  <i id="rangeFill"></i><b id="priceMarker"></b>
+                  <i id="rangeFill"></i><b id="priceMarker"></b
+                  ><input id="minPriceSlider" class="price-range-slider" type="range" min="0" max="1000" step="1" aria-label="拖动选择最低价格"
+                  ><input id="maxPriceSlider" class="price-range-slider" type="range" min="0" max="1000" step="1" aria-label="拖动选择最高价格">
                 </div>
                 <div class="current-price">
                   <span>当前池价格</span><strong id="poolPrice">读取中…</strong>
@@ -488,7 +490,7 @@
     </dialog>
     <div id="toast" role="status" aria-live="polite"></div>
     <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
-    <script src="./config.js?v=24"></script>
-    <script src="./app.js?v=24"></script>
+    <script src="./config.js?v=25"></script>
+    <script src="./app.js?v=25"></script>
   </body>
 </html>

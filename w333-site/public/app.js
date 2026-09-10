@@ -2254,3 +2254,84 @@ $('stakeTokenId').addEventListener("input", refreshRewards);
 setInterval(() => {
   if (document.visibilityState === "visible") loadMarketHistory(true);
 }, 30000);
+
+// Draggable V3 price-range handles. The scale is logarithmic around the
+// current pool price so both tight and wide ranges remain easy to select.
+const minPriceSlider = $("minPriceSlider"),
+  maxPriceSlider = $("maxPriceSlider"),
+  sliderFloorRatio = 0.1,
+  sliderCeilRatio = 10;
+function priceFromSlider(value) {
+  const progress = Number(value) / 1000;
+  return (
+    currentPrice *
+    Math.exp(
+      Math.log(sliderFloorRatio) +
+        progress * Math.log(sliderCeilRatio / sliderFloorRatio),
+    )
+  );
+}
+function sliderFromPrice(price) {
+  if (!(price > 0 && currentPrice > 0)) return 0;
+  return Math.max(
+    0,
+    Math.min(
+      1000,
+      Math.round(
+        (Math.log(price / currentPrice / sliderFloorRatio) /
+          Math.log(sliderCeilRatio / sliderFloorRatio)) *
+          1000,
+      ),
+    ),
+  );
+}
+function syncPriceSlidersFromNumbers() {
+  if (fullRange) {
+    minPriceSlider.value = 0;
+    maxPriceSlider.value = 1000;
+    return;
+  }
+  const min = Number($("minPrice").value),
+    max = Number($("maxPrice").value);
+  if (min > 0) minPriceSlider.value = sliderFromPrice(min);
+  if (max > min) maxPriceSlider.value = sliderFromPrice(max);
+}
+const baseUpdateRangeVisual = updateRangeVisual;
+updateRangeVisual = function () {
+  baseUpdateRangeVisual();
+  syncPriceSlidersFromNumbers();
+  const left = fullRange ? 0 : Number(minPriceSlider.value) / 10,
+    right = fullRange ? 100 : Number(maxPriceSlider.value) / 10;
+  $("rangeFill").style.left = left + "%";
+  $("rangeFill").style.width = Math.max(0, right - left) + "%";
+  $("priceMarker").style.left = "50%";
+};
+function updatePricesFromSlider(changed) {
+  let low = Number(minPriceSlider.value),
+    high = Number(maxPriceSlider.value);
+  if (changed === "min" && low >= high) {
+    low = Math.max(0, high - 1);
+    minPriceSlider.value = low;
+  }
+  if (changed === "max" && high <= low) {
+    high = Math.min(1000, low + 1);
+    maxPriceSlider.value = high;
+  }
+  fullRange = false;
+  document
+    .querySelectorAll("[data-range]")
+    .forEach((button) => button.classList.remove("active"));
+  $("minPrice").value = fmtPrice(priceFromSlider(low));
+  $("maxPrice").value = fmtPrice(priceFromSlider(high));
+  baseUpdateRangeVisual();
+  $("rangeFill").style.left = low / 10 + "%";
+  $("rangeFill").style.width = (high - low) / 10 + "%";
+  $("priceMarker").style.left = "50%";
+  updateMatchedLiquidityAmounts();
+}
+minPriceSlider.oninput = () => updatePricesFromSlider("min");
+maxPriceSlider.oninput = () => updatePricesFromSlider("max");
+[$("minPrice"), $("maxPrice")].forEach((input) =>
+  input.addEventListener("input", () => setTimeout(syncPriceSlidersFromNumbers, 0)),
+);
+syncPriceSlidersFromNumbers();
