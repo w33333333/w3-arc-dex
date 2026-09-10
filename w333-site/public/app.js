@@ -654,7 +654,6 @@ async function loadPositions() {
       '<div class="empty-position"><b>连接钱包后查看</b><span>这里会显示已添加的 V3 LP 仓位。</span></div>';
     return;
   }
-  list.innerHTML = '<div class="empty-position"><b>正在读取仓位…</b></div>';
   try {
     const m = new ethers.Contract(C.positionManager, NFPM, provider),
       count = Number(await m.balanceOf(account)),
@@ -1245,10 +1244,6 @@ document.title = "W3 · ARC DEX";
 document
   .querySelector('meta[name="theme-color"]')
   ?.setAttribute("content", "#f2f1e9");
-const theme = document.createElement("link");
-theme.rel = "stylesheet";
-theme.href = "./w333-theme.css";
-document.head.append(theme);
 const dexNav = document.querySelector(".topbar nav"),
   swapNav = dexNav?.querySelector('[data-panel="swap"]'),
   liquidityNav = dexNav?.querySelector('[data-liq-nav="add"]');
@@ -1385,7 +1380,6 @@ loadPositions = async function () {
       '<div class="empty-position"><b>连接钱包后查看</b><span>这里会显示已添加的 V3 LP 仓位。</span></div>';
     return;
   }
-  list.innerHTML = '<div class="empty-position"><b>正在读取仓位…</b></div>';
   try {
     const m = new ethers.Contract(C.positionManager, NFPM, provider),
       count = Number(await m.balanceOf(account)),
@@ -1506,9 +1500,6 @@ loadPositions = async function () {
     $("removedCount").textContent = "0 个";
     return;
   }
-  list.innerHTML = '<div class="empty-position"><b>正在读取仓位…</b></div>';
-  removedList.innerHTML =
-    '<div class="removed-empty">正在读取已移除仓位…</div>';
   try {
     const m = new ethers.Contract(C.positionManager, NFPM, provider),
       count = Number(await m.balanceOf(account)),
@@ -1632,7 +1623,6 @@ loadPositions = async function () {
       feeCell = row.querySelector(".position-cell:nth-child(5)");
     if (!match || !feeCell) continue;
     const strong = feeCell.querySelector("strong");
-    strong.textContent = "读取中…";
     try {
       const item = positionCache.get(match[1]),
         quoted = await m.collect.staticCall({
@@ -1675,7 +1665,6 @@ async function loadStakedPositions() {
     $("stakedCount").textContent = "0 个";
     return;
   }
-  list.innerHTML = '<div class="staked-empty">正在读取已质押流动性…</div>';
   try {
     const m = new ethers.Contract(C.positionManager, NFPM, provider),
       s = new ethers.Contract(C.staker, STAKER, provider),
