@@ -360,6 +360,19 @@ async function loadPool() {
     $("poolPrice").textContent = "池状态读取失败";
   }
 }
+let poolDirectoryRetryTimer;
+function fallbackPoolRows() {
+  return FEES.map(
+    (f) =>
+      '<div class="pool-row"><div class="pool-name"><span class="token-stack"><i>$</i><i>W3</i></span><span><b>USDC / W3</b><small>' +
+      feeLabel(f) +
+      ' fee · V3</small></span><button class="detail-link" data-detail-fee="' +
+      f +
+      '">详情</button></div><div class="metric"><small>TVL</small><b>—</b></div><div class="metric"><small>24H 交易量</small><b>—</b></div><div class="metric"><small>24H 手续费</small><b class="green">—</b></div><div class="metric"><small>剩余 W3 激励</small><b class="green">—</b></div><div class="metric"><small>APR</small><b class="purple">—</b></div><button class="deposit-btn" data-pool-fee="' +
+      f +
+      '">添加</button></div>',
+  ).join("");
+}
 async function loadPoolDirectory() {
   const rows = $("poolRows"),
     usdc = new ethers.Contract(C.usdc, ERC20, provider),
@@ -458,9 +471,21 @@ async function loadPoolDirectory() {
         (b) => (b.onclick = () => showPoolDetail(Number(b.dataset.detailFee))),
       );
     renderIncentives();
+    clearTimeout(poolDirectoryRetryTimer);
   } catch {
-    rows.innerHTML =
-      '<div class="pool-loading">池数据读取失败，请稍后刷新页面。</div>';
+    // Keep the last successful snapshot on screen. On first-load RPC failure,
+    // render the three known pools immediately and retry quietly in background.
+    if (!rows.querySelector(".pool-row")) rows.innerHTML = fallbackPoolRows();
+    rows.querySelectorAll("[data-detail-fee]").forEach(
+      (button) =>
+        (button.onclick = () => {
+          const f = Number(button.dataset.detailFee);
+          if (poolState[f]) showPoolDetail(f);
+          else toast("池数据正在后台同步");
+        }),
+    );
+    clearTimeout(poolDirectoryRetryTimer);
+    poolDirectoryRetryTimer = setTimeout(loadPoolDirectory, 3000);
   }
 }
 let addIncentiveFee = 500;
